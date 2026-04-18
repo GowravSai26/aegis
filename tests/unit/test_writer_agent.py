@@ -1,6 +1,8 @@
-from unittest.mock import patch, MagicMock
-from agents.writer_agent import writer_agent
+from unittest.mock import MagicMock, patch
+
 from agents.state import AegisState
+from agents.writer_agent import writer_agent
+
 
 def make_state(**kwargs):
     return AegisState(
@@ -27,8 +29,9 @@ def make_state(**kwargs):
         document_path="",
         escalation_reason=None,
         agent_trace=[],
-        **kwargs
+        **kwargs,
     )
+
 
 @patch("agents.writer_agent.ChatGroq")
 def test_writer_produces_draft(mock_groq):

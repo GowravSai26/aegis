@@ -1,6 +1,8 @@
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
 from agents.intake_agent import intake_agent
 from agents.state import AegisState
+
 
 def make_state(**kwargs):
     return AegisState(
@@ -27,8 +29,9 @@ def make_state(**kwargs):
         document_path="",
         escalation_reason=None,
         agent_trace=[],
-        **kwargs
+        **kwargs,
     )
+
 
 @patch("agents.intake_agent.ChatGroq")
 def test_intake_agent_sets_category(mock_groq):

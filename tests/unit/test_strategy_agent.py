@@ -1,6 +1,8 @@
-from unittest.mock import patch, MagicMock
-from agents.strategy_agent import strategy_agent
+from unittest.mock import MagicMock, patch
+
 from agents.state import AegisState
+from agents.strategy_agent import strategy_agent
+
 
 def make_state(**kwargs):
     return AegisState(
@@ -27,8 +29,9 @@ def make_state(**kwargs):
         document_path="",
         escalation_reason=None,
         agent_trace=[],
-        **kwargs
+        **kwargs,
     )
+
 
 @patch("agents.strategy_agent.ChatGroq")
 def test_strategy_returns_fight(mock_groq):
@@ -42,6 +45,7 @@ def test_strategy_returns_fight(mock_groq):
     assert result["verdict"] is not None
     assert 0.0 <= result["winability_score"] <= 1.0
     assert any("StrategyAgent" in t for t in result["agent_trace"])
+
 
 @patch("agents.strategy_agent.ChatGroq")
 def test_strategy_returns_accept(mock_groq):

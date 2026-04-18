@@ -1,6 +1,8 @@
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
 from agents.reviewer_agent import reviewer_agent
 from agents.state import AegisState
+
 
 def make_state(**kwargs):
     return AegisState(
@@ -27,8 +29,9 @@ def make_state(**kwargs):
         document_path="",
         escalation_reason=None,
         agent_trace=[],
-        **kwargs
+        **kwargs,
     )
+
 
 @patch("agents.reviewer_agent.ChatGroq")
 def test_reviewer_passes(mock_groq):
@@ -41,6 +44,7 @@ def test_reviewer_passes(mock_groq):
 
     assert isinstance(result["review_passed"], bool)
     assert any("ReviewerAgent" in t for t in result["agent_trace"])
+
 
 @patch("agents.reviewer_agent.ChatGroq")
 def test_reviewer_fails_and_gives_feedback(mock_groq):

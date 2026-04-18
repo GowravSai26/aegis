@@ -1,6 +1,8 @@
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
 from agents.evidence_collector_agent import evidence_collector_agent
 from agents.state import AegisState
+
 
 def make_state(**kwargs):
     return AegisState(
@@ -27,8 +29,9 @@ def make_state(**kwargs):
         document_path="",
         escalation_reason=None,
         agent_trace=[],
-        **kwargs
+        **kwargs,
     )
+
 
 @patch("agents.evidence_collector_agent.ChatGroq")
 def test_evidence_collector_returns_strength(mock_groq):
