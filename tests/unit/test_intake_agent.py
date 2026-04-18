@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock, patch
 
-from agents.intake_agent import intake_agent
+from agents.intake_agent import run_intake_agent
 from agents.state import AegisState
 
 
@@ -40,7 +40,7 @@ def test_intake_agent_sets_category(mock_groq):
     mock_groq.return_value = mock_llm
 
     state = make_state()
-    result = intake_agent(state)
+    result = run_intake_agent(state)
 
     assert result["dispute_category"] == "not_received"
     assert result["urgency"] == "HIGH"

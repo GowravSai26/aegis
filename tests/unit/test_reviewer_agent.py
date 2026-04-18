@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock, patch
 
-from agents.reviewer_agent import reviewer_agent
+from agents.reviewer_agent import run_reviewer_agent
 from agents.state import AegisState
 
 
@@ -40,7 +40,7 @@ def test_reviewer_passes(mock_groq):
     mock_groq.return_value = mock_llm
 
     state = make_state()
-    result = reviewer_agent(state)
+    result = run_reviewer_agent(state)
 
     assert isinstance(result["review_passed"], bool)
     assert any("ReviewerAgent" in t for t in result["agent_trace"])
@@ -53,6 +53,6 @@ def test_reviewer_fails_and_gives_feedback(mock_groq):
     mock_groq.return_value = mock_llm
 
     state = make_state(draft_response="Too short.")
-    result = reviewer_agent(state)
+    result = run_reviewer_agent(state)
 
     assert isinstance(result["review_passed"], bool)

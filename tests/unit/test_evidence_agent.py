@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock, patch
 
-from agents.evidence_collector_agent import evidence_collector_agent
+from agents.evidence_collector_agent import run_evidence_collector_agent
 from agents.state import AegisState
 
 
@@ -40,7 +40,7 @@ def test_evidence_collector_returns_strength(mock_groq):
     mock_groq.return_value = mock_llm
 
     state = make_state()
-    result = evidence_collector_agent(state)
+    result = run_evidence_collector_agent(state)
 
     assert result["evidence_strength"] >= 0.0
     assert isinstance(result["evidence_collected"], dict)

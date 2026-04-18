@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 from agents.state import AegisState
-from agents.writer_agent import writer_agent
+from agents.writer_agent import run_writer_agent
 
 
 def make_state(**kwargs):
@@ -40,7 +40,7 @@ def test_writer_produces_draft(mock_groq):
     mock_groq.return_value = mock_llm
 
     state = make_state()
-    result = writer_agent(state)
+    result = run_writer_agent(state)
 
     assert len(result["draft_response"]) > 0
     assert any("WriterAgent" in t for t in result["agent_trace"])

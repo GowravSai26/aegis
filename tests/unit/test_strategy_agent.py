@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 from agents.state import AegisState
-from agents.strategy_agent import strategy_agent
+from agents.strategy_agent import run_strategy_agent
 
 
 def make_state(**kwargs):
@@ -40,7 +40,7 @@ def test_strategy_returns_fight(mock_groq):
     mock_groq.return_value = mock_llm
 
     state = make_state()
-    result = strategy_agent(state)
+    result = run_strategy_agent(state)
 
     assert result["verdict"] is not None
     assert 0.0 <= result["winability_score"] <= 1.0
@@ -54,6 +54,6 @@ def test_strategy_returns_accept(mock_groq):
     mock_groq.return_value = mock_llm
 
     state = make_state(evidence_strength=0.1)
-    result = strategy_agent(state)
+    result = run_strategy_agent(state)
 
     assert result["verdict"] is not None
