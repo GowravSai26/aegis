@@ -5,13 +5,14 @@ from agents.state import AegisState
 
 
 def make_state(**kwargs):
-    return AegisState(
+    base = AegisState(
         chargeback_id="CB-TEST",
         merchant_id="MERCH-001",
         transaction_id="TXN-001",
         amount=450.0,
         reason_code="13.1",
         reason_description="Item not received",
+        dispute_deadline="2024-04-01",
         dispute_category="not_received",
         urgency="MEDIUM",
         required_evidence=[],
@@ -22,15 +23,17 @@ def make_state(**kwargs):
         winability_score=0.8,
         strategy_reasoning="Strong evidence",
         recommended_arguments=["Delivery confirmed"],
-        draft_response="This is a formal dispute response.",
+        dispute_response_draft="This is a formal dispute response.",
         revision_count=0,
         review_passed=False,
         review_feedback="",
         document_path="",
         escalation_reason=None,
         agent_trace=[],
-        **kwargs,
+        error=None,
     )
+    base.update(kwargs)
+    return base
 
 
 @patch("agents.reviewer_agent.ChatGroq")
@@ -49,10 +52,12 @@ def test_reviewer_passes(mock_groq):
 @patch("agents.reviewer_agent.ChatGroq")
 def test_reviewer_fails_and_gives_feedback(mock_groq):
     mock_llm = MagicMock()
-    mock_llm.invoke.return_value.content = '{"review_passed": false, "feedback": "Missing delivery details"}'
+    mock_llm.invoke.return_value.content = (
+        '{"review_passed": false, "feedback": "Missing delivery details"}'
+    )
     mock_groq.return_value = mock_llm
 
-    state = make_state(draft_response="Too short.")
+    state = make_state(dispute_response_draft="Too short.")
     result = run_reviewer_agent(state)
 
     assert isinstance(result["review_passed"], bool)
