@@ -1,8 +1,10 @@
-from langchain_groq import ChatGroq
-from langchain_core.messages import SystemMessage, HumanMessage
-from agents.state import AegisState
-from dotenv import load_dotenv
 import os
+
+from dotenv import load_dotenv
+from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_groq import ChatGroq
+
+from agents.state import AegisState
 
 load_dotenv()
 
@@ -55,6 +57,7 @@ Submitted by AEGIS Autonomous Dispute System
 
 Write the full document now. No preamble, start directly with CHARGEBACK DISPUTE RESPONSE."""
 
+
 def run_writer_agent(state: AegisState) -> AegisState:
     from datetime import datetime
 
@@ -66,24 +69,24 @@ def run_writer_agent(state: AegisState) -> AegisState:
     prompt = f"""
 Write a dispute response for this chargeback:
 
-Case Reference: {state['chargeback_id']}
-Merchant: {order.get('merchant_name', 'Unknown Merchant')}
-Transaction Date: {order.get('order_date', 'N/A')}
-Dispute Amount: ${state['amount']}
-Reason Code: {state['reason_code']} — {state['reason_description']}
-Response Deadline: {state['dispute_deadline']}
-Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
+Case Reference: {state["chargeback_id"]}
+Merchant: {order.get("merchant_name", "Unknown Merchant")}
+Transaction Date: {order.get("order_date", "N/A")}
+Dispute Amount: ${state["amount"]}
+Reason Code: {state["reason_code"]} — {state["reason_description"]}
+Response Deadline: {state["dispute_deadline"]}
+Timestamp: {datetime.now().strftime("%Y-%m-%d %H:%M:%S UTC")}
 
-Strategy verdict: {state.get('verdict')}
-Winability score: {state.get('winability_score')}
-Recommended arguments: {state.get('recommended_arguments')}
+Strategy verdict: {state.get("verdict")}
+Winability score: {state.get("winability_score")}
+Recommended arguments: {state.get("recommended_arguments")}
 
 Evidence collected:
 - Order details: {order}
-- Delivery proof: {state.get('evidence_collected', {}).get('delivery_proof')}
-- Device data: {state.get('evidence_collected', {}).get('device_data')}
-- Auth status: {state.get('evidence_collected', {}).get('auth_status')}
-- Correspondence: {state.get('evidence_collected', {}).get('correspondence')}
+- Delivery proof: {state.get("evidence_collected", {}).get("delivery_proof")}
+- Device data: {state.get("evidence_collected", {}).get("device_data")}
+- Auth status: {state.get("evidence_collected", {}).get("auth_status")}
+- Correspondence: {state.get("evidence_collected", {}).get("correspondence")}
 {feedback_section}
 """
     response = llm.invoke([SystemMessage(content=SYSTEM), HumanMessage(content=prompt)])

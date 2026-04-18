@@ -1,9 +1,12 @@
+import json
+import os
+
+from dotenv import load_dotenv
+from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_groq import ChatGroq
-from langchain_core.messages import SystemMessage, HumanMessage
+
 from agents.state import AegisState, DisputeVerdict
 from tools.reason_code_rules import get_winability_factors
-from dotenv import load_dotenv
-import json, os
 
 load_dotenv()
 
@@ -31,23 +34,25 @@ Rules:
 
 Return only valid JSON. No markdown. No backticks. No explanation."""
 
+
 def _parse(content: str) -> dict:
     clean = content.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
     return json.loads(clean)
+
 
 def run_strategy_agent(state: AegisState) -> AegisState:
     winability_factors = get_winability_factors(state["reason_code"])
 
     prompt = f"""
-Chargeback: {state['chargeback_id']}
-Reason Code: {state['reason_code']} — {state['reason_description']}
-Amount: ${state['amount']}
-Evidence Strength: {state['evidence_strength']}
-Missing Evidence: {state['missing_evidence']}
+Chargeback: {state["chargeback_id"]}
+Reason Code: {state["reason_code"]} — {state["reason_description"]}
+Amount: ${state["amount"]}
+Evidence Strength: {state["evidence_strength"]}
+Missing Evidence: {state["missing_evidence"]}
 Winability Factors for this reason code: {winability_factors}
 
 Evidence collected:
-{json.dumps(state.get('evidence_collected', {}), indent=2, default=str)}
+{json.dumps(state.get("evidence_collected", {}), indent=2, default=str)}
 
 Make your FIGHT / ACCEPT / ESCALATE decision.
 """
@@ -65,10 +70,7 @@ Make your FIGHT / ACCEPT / ESCALATE decision.
 
     verdict = DisputeVerdict(parsed.get("verdict", "ESCALATE"))
     trace = state.get("agent_trace", [])
-    trace.append(
-        f"StrategyAgent: verdict={verdict} | "
-        f"winability={parsed.get('winability_score')}"
-    )
+    trace.append(f"StrategyAgent: verdict={verdict} | winability={parsed.get('winability_score')}")
 
     return {
         **state,

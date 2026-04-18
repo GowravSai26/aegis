@@ -1,10 +1,12 @@
+from pathlib import Path
+
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse
-from api.schemas import DisputeRequest, DisputeResponse
+
 from agents.orchestrator import aegis_graph
 from agents.state import AegisState
+from api.schemas import DisputeRequest, DisputeResponse
 from tools.document_generator import generate_docx
-from pathlib import Path
 
 router = APIRouter()
 
@@ -18,12 +20,24 @@ def _build_state(req: DisputeRequest) -> AegisState:
         reason_code=req.reason_code,
         reason_description=req.reason_description,
         dispute_deadline=req.dispute_deadline,
-        dispute_category=None, urgency=None, required_evidence=None,
-        evidence_collected=None, evidence_strength=None, missing_evidence=None,
-        verdict=None, winability_score=None, strategy_reasoning=None,
-        recommended_arguments=None, dispute_response_draft=None,
-        document_path=None, revision_count=0, review_passed=None,
-        review_feedback=None, escalation_reason=None, agent_trace=[], error=None,
+        dispute_category=None,
+        urgency=None,
+        required_evidence=None,
+        evidence_collected=None,
+        evidence_strength=None,
+        missing_evidence=None,
+        verdict=None,
+        winability_score=None,
+        strategy_reasoning=None,
+        recommended_arguments=None,
+        dispute_response_draft=None,
+        document_path=None,
+        revision_count=0,
+        review_passed=None,
+        review_feedback=None,
+        escalation_reason=None,
+        agent_trace=[],
+        error=None,
     )
 
 

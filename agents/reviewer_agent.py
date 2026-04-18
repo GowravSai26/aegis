@@ -1,8 +1,11 @@
-from langchain_groq import ChatGroq
-from langchain_core.messages import SystemMessage, HumanMessage
-from agents.state import AegisState
+import json
+import os
+
 from dotenv import load_dotenv
-import json, os
+from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_groq import ChatGroq
+
+from agents.state import AegisState
 
 load_dotenv()
 
@@ -30,27 +33,32 @@ Pass criteria: all checks true AND argument is legally sound.
 
 Return only valid JSON. No markdown. No backticks."""
 
+
 def _parse(content: str) -> dict:
     clean = content.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
     return json.loads(clean)
+
 
 def run_reviewer_agent(state: AegisState) -> AegisState:
     prompt = f"""
 Review this dispute response document:
 
-{state.get('dispute_response_draft', '')}
+{state.get("dispute_response_draft", "")}
 
 ---
-Required evidence for reason code {state['reason_code']}: {state.get('required_evidence')}
-Recommended arguments: {state.get('recommended_arguments')}
-Revision number: {state.get('revision_count', 0)}
+Required evidence for reason code {state["reason_code"]}: {state.get("required_evidence")}
+Recommended arguments: {state.get("recommended_arguments")}
+Revision number: {state.get("revision_count", 0)}
 """
     response = llm.invoke([SystemMessage(content=SYSTEM), HumanMessage(content=prompt)])
 
     try:
         parsed = _parse(response.content)
     except json.JSONDecodeError:
-        parsed = {"review_passed": False, "feedback": "Could not parse review — please revise for clarity."}
+        parsed = {
+            "review_passed": False,
+            "feedback": "Could not parse review — please revise for clarity.",
+        }
 
     passed = parsed.get("review_passed", False)
     trace = state.get("agent_trace", [])

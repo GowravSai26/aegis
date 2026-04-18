@@ -1,6 +1,6 @@
-from typing import Optional
 from datetime import datetime, timedelta
-import random
+from typing import Optional
+
 
 def get_order(transaction_id: str) -> Optional[dict]:
     """Fetch order details for a transaction."""

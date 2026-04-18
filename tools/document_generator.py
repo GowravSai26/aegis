@@ -1,8 +1,8 @@
-from docx import Document
-from docx.shared import Pt, RGBColor
-from docx.enum.text import WD_ALIGN_PARAGRAPH
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
+from docx import Document
+from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 
 def generate_docx(state: dict) -> str:
@@ -21,7 +21,10 @@ def generate_docx(state: dict) -> str:
         ("Merchant", order.get("merchant_name", "Unknown")),
         ("Transaction Date", str(order.get("order_date", ""))[:10]),
         ("Dispute Amount", f"${state.get('amount', 0):.2f}"),
-        ("Reason Code", f"{state.get('reason_code')} — {state.get('reason_description')}"),
+        (
+            "Reason Code",
+            f"{state.get('reason_code')} — {state.get('reason_description')}",
+        ),
         ("Response Deadline", state.get("dispute_deadline", "")),
     ]
     for i, (label, value) in enumerate(rows):
@@ -42,8 +45,11 @@ def generate_docx(state: dict) -> str:
 
     for line in body.splitlines():
         if line.strip() in (
-            "EXECUTIVE SUMMARY", "EVIDENCE SUMMARY",
-            "DETAILED ARGUMENT", "EVIDENCE ATTACHMENTS", "MERCHANT REQUEST"
+            "EXECUTIVE SUMMARY",
+            "EVIDENCE SUMMARY",
+            "DETAILED ARGUMENT",
+            "EVIDENCE ATTACHMENTS",
+            "MERCHANT REQUEST",
         ):
             doc.add_heading(line.strip(), level=2)
         elif line.startswith("-" * 5):
@@ -54,8 +60,7 @@ def generate_docx(state: dict) -> str:
     # Footer
     doc.add_paragraph()
     footer = doc.add_paragraph(
-        f"Submitted by AEGIS Autonomous Dispute System\n"
-        f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}"
+        f"Submitted by AEGIS Autonomous Dispute System\nGenerated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}"
     )
     footer.alignment = WD_ALIGN_PARAGRAPH.CENTER
 

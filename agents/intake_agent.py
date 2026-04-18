@@ -1,9 +1,12 @@
+import json
+import os
+
+from dotenv import load_dotenv
+from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_groq import ChatGroq
-from langchain_core.messages import SystemMessage, HumanMessage
+
 from agents.state import AegisState
 from tools.reason_code_rules import get_reason_code, get_required_evidence
-from dotenv import load_dotenv
-import json, os
 
 load_dotenv()
 
@@ -21,13 +24,14 @@ Given a chargeback notification, you must return ONLY a JSON object with these f
 
 Return only valid JSON. No explanation, no markdown."""
 
+
 def run_intake_agent(state: AegisState) -> AegisState:
     prompt = f"""
-Chargeback ID: {state['chargeback_id']}
-Reason Code: {state['reason_code']}
-Reason Description: {state['reason_description']}
-Amount: ${state['amount']}
-Deadline: {state['dispute_deadline']}
+Chargeback ID: {state["chargeback_id"]}
+Reason Code: {state["reason_code"]}
+Reason Description: {state["reason_description"]}
+Amount: ${state["amount"]}
+Deadline: {state["dispute_deadline"]}
 """
     response = llm.invoke([SystemMessage(content=SYSTEM), HumanMessage(content=prompt)])
 
@@ -35,7 +39,11 @@ Deadline: {state['dispute_deadline']}
         raw = response.content.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
         parsed = json.loads(raw)
     except json.JSONDecodeError:
-        parsed = {"dispute_category": "other", "urgency": "HIGH", "summary": "Parse error"}
+        parsed = {
+            "dispute_category": "other",
+            "urgency": "HIGH",
+            "summary": "Parse error",
+        }
 
     required = get_required_evidence(state["reason_code"])
     code_info = get_reason_code(state["reason_code"])

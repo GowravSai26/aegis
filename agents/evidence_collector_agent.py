@@ -1,13 +1,16 @@
+import json
+import os
+
+from dotenv import load_dotenv
+from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_groq import ChatGroq
-from langchain_core.messages import SystemMessage, HumanMessage
+
 from agents.state import AegisState
-from tools.order_lookup import get_order
-from tools.delivery_proof import get_delivery_proof
-from tools.device_fingerprint import get_device_data
 from tools.auth_history import get_auth_status
 from tools.cardholder_comms import get_correspondence
-from dotenv import load_dotenv
-import json, os
+from tools.delivery_proof import get_delivery_proof
+from tools.device_fingerprint import get_device_data
+from tools.order_lookup import get_order
 
 load_dotenv()
 
@@ -24,6 +27,7 @@ Given collected evidence and required evidence list, return ONLY a JSON object:
 - summary: one sentence assessment
 
 Return only valid JSON. No explanation, no markdown."""
+
 
 def _collect(transaction_id: str, required: list[str]) -> dict:
     collected = {}
@@ -47,12 +51,13 @@ def _collect(transaction_id: str, required: list[str]) -> dict:
 
     return collected
 
+
 def run_evidence_collector_agent(state: AegisState) -> AegisState:
     required = state.get("required_evidence") or []
     collected = _collect(state["transaction_id"], required)
 
     prompt = f"""
-Required evidence for reason code {state['reason_code']}: {required}
+Required evidence for reason code {state["reason_code"]}: {required}
 
 Collected evidence:
 {json.dumps(collected, indent=2, default=str)}
@@ -65,12 +70,15 @@ Assess how well the collected evidence covers the required evidence.
         raw = response.content.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
         parsed = json.loads(raw)
     except json.JSONDecodeError:
-        parsed = {"evidence_strength": 0.5, "missing_evidence": [], "summary": "Parse error"}
+        parsed = {
+            "evidence_strength": 0.5,
+            "missing_evidence": [],
+            "summary": "Parse error",
+        }
 
     trace = state.get("agent_trace", [])
     trace.append(
-        f"EvidenceCollector: strength={parsed.get('evidence_strength')} | "
-        f"missing={parsed.get('missing_evidence')}"
+        f"EvidenceCollector: strength={parsed.get('evidence_strength')} | missing={parsed.get('missing_evidence')}"
     )
 
     return {

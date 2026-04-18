@@ -1,6 +1,7 @@
-from pydantic import BaseModel, Field
-from typing import Optional, List
 from datetime import datetime, timedelta
+from typing import List, Optional
+
+from pydantic import BaseModel, Field
 
 
 class DisputeRequest(BaseModel):
@@ -10,9 +11,7 @@ class DisputeRequest(BaseModel):
     amount: float
     reason_code: str
     reason_description: str = ""
-    dispute_deadline: str = Field(
-        default_factory=lambda: (datetime.now() + timedelta(days=30)).strftime("%Y-%m-%d")
-    )
+    dispute_deadline: str = Field(default_factory=lambda: (datetime.now() + timedelta(days=30)).strftime("%Y-%m-%d"))
 
 
 class DisputeResponse(BaseModel):

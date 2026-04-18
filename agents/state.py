@@ -1,5 +1,5 @@
-from typing import TypedDict, Optional, List
 from enum import Enum
+from typing import List, Optional, TypedDict
 
 
 class DisputeVerdict(str, Enum):
@@ -20,12 +20,12 @@ class AegisState(TypedDict):
 
     # Intake Agent output
     dispute_category: Optional[str]
-    urgency: Optional[str]           # HIGH / MEDIUM / LOW
+    urgency: Optional[str]  # HIGH / MEDIUM / LOW
     required_evidence: Optional[List[str]]
 
     # Evidence Collector output
     evidence_collected: Optional[dict]
-    evidence_strength: Optional[float]   # 0.0 - 1.0
+    evidence_strength: Optional[float]  # 0.0 - 1.0
     missing_evidence: Optional[List[str]]
 
     # Strategy Agent output

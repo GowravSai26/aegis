@@ -1,10 +1,11 @@
-from langgraph.graph import StateGraph, END
-from agents.state import AegisState, DisputeVerdict
-from agents.intake_agent import run_intake_agent
+from langgraph.graph import END, StateGraph
+
 from agents.evidence_collector_agent import run_evidence_collector_agent
+from agents.intake_agent import run_intake_agent
+from agents.reviewer_agent import run_reviewer_agent
+from agents.state import AegisState, DisputeVerdict
 from agents.strategy_agent import run_strategy_agent
 from agents.writer_agent import run_writer_agent
-from agents.reviewer_agent import run_reviewer_agent
 
 
 def escalate_node(state: AegisState) -> AegisState:

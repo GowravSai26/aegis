@@ -1,5 +1,6 @@
-from typing import Optional
 from datetime import datetime, timedelta
+from typing import Optional
+
 
 def get_delivery_proof(order_id: str) -> Optional[dict]:
     """Get delivery confirmation and tracking info."""
