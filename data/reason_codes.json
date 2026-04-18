@@ -1,0 +1,50 @@
+{
+  "10.4": {
+    "name": "Fraud — Card Absent Environment",
+    "required_evidence": ["device_fingerprint", "ip_address", "3ds_auth_status", "transaction_history", "cardholder_correspondence"],
+    "response_window_days": 30,
+    "winability_factors": ["3ds_completed", "device_match", "prior_purchases_same_merchant"]
+  },
+  "13.1": {
+    "name": "Merchandise / Services Not Received",
+    "required_evidence": ["delivery_confirmation", "tracking_number", "carrier_proof", "order_details"],
+    "response_window_days": 30,
+    "winability_factors": ["delivery_confirmed", "customer_signed", "digital_delivery_log"]
+  },
+  "13.2": {
+    "name": "Cancelled Recurring Transaction",
+    "required_evidence": ["cancellation_policy", "terms_of_service", "no_cancellation_request_proof"],
+    "response_window_days": 30,
+    "winability_factors": ["no_cancellation_received", "service_still_active", "terms_accepted"]
+  },
+  "12.6": {
+    "name": "Duplicate Processing",
+    "required_evidence": ["transaction_logs", "distinct_merchant_proof", "order_ids"],
+    "response_window_days": 30,
+    "winability_factors": ["different_order_ids", "different_timestamps", "different_amounts"]
+  },
+  "13.7": {
+    "name": "Cancelled Merchandise / Services",
+    "required_evidence": ["no_cancellation_request", "service_delivery_proof", "terms_of_service"],
+    "response_window_days": 30,
+    "winability_factors": ["service_delivered", "no_cancellation_received"]
+  },
+  "10.5": {
+    "name": "Visa Fraud Monitoring Program",
+    "required_evidence": ["full_transaction_history", "fraud_prevention_measures", "3ds_implementation"],
+    "response_window_days": 30,
+    "winability_factors": ["low_fraud_rate", "3ds_enabled", "strong_auth"]
+  },
+  "13.3": {
+    "name": "Not as Described or Defective",
+    "required_evidence": ["product_description", "photos", "customer_correspondence", "return_policy"],
+    "response_window_days": 30,
+    "winability_factors": ["accurate_description", "no_complaint_received", "return_policy_clear"]
+  },
+  "11.3": {
+    "name": "No Authorization",
+    "required_evidence": ["authorization_record", "approval_code", "transaction_logs"],
+    "response_window_days": 30,
+    "winability_factors": ["authorization_exists", "approval_code_matches"]
+  }
+}

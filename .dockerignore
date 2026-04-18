@@ -1,0 +1,11 @@
+.venv
+__pycache__
+*.pyc
+.env
+.git
+.github
+generated_docs/
+*.docx
+tests/
+*.md
+.DS_Store
