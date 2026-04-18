@@ -52,9 +52,7 @@ def test_reviewer_passes(mock_groq):
 @patch("agents.reviewer_agent.ChatGroq")
 def test_reviewer_fails_and_gives_feedback(mock_groq):
     mock_llm = MagicMock()
-    mock_llm.invoke.return_value.content = (
-        '{"review_passed": false, "feedback": "Missing delivery details"}'
-    )
+    mock_llm.invoke.return_value.content = '{"review_passed": false, "feedback": "Missing delivery details"}'
     mock_groq.return_value = mock_llm
 
     state = make_state(dispute_response_draft="Too short.")

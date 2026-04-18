@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
-from agents.strategy_agent import run_strategy_agent
 from agents.state import AegisState
+from agents.strategy_agent import run_strategy_agent
 
 
 def make_state(**kwargs):
