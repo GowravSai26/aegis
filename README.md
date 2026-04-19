@@ -1,4 +1,3 @@
-```markdown
 # ⚔️ AEGIS — Autonomous Chargeback Defense System
 
 > *Named after the aegis — the divine shield of Zeus and Athena in Greek mythology. Unbreakable. Carried into every battle.*
@@ -10,7 +9,7 @@
 [![CI](https://img.shields.io/badge/CI-Passing-10B981?style=flat)](/)
 [![Live](https://img.shields.io/badge/Live-Railway-7C5CBF?style=flat)](https://aegis-production-1d9a.up.railway.app)
 
----
+
 
 ## 🔴 Live API
 
@@ -98,6 +97,7 @@ The Reviewer → Writer loop runs until the response passes review or hits the r
 
 ## Architecture
 
+```text
 ┌──────────────────────────────────────────────────────────────┐
 │                        CLIENT / API                          │
 │              POST /dispute  {chargeback payload}             │
@@ -143,8 +143,6 @@ The Reviewer → Writer loop runs until the response passes review or hits the r
 │   Full trace of every agent run — LLM calls, tool results,   │
 │   revision loops, token usage, latency per step              │
 └──────────────────────────────────────────────────────────────┘
-```
-
 ---
 
 ## API Reference
