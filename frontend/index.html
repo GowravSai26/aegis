@@ -1026,80 +1026,161 @@ function renderResults(data, id){
   $('dlBtn').onclick=()=>downloadDoc(id);
 }
 
-async function submitDispute(){
-  const data=collectForm();
-  const err=validate(data);
-  if(err){toast(err);return}
+async function submitDispute() {
+  const data = collectForm();
+  const err = validate(data);
+  if (err) {
+    toast(err);
+    return;
+  }
 
-  const btn=$('submitBtn');
-  btn.disabled=true;
-  btn.querySelector('span').textContent='ANALYSING…';
+  const btn = $('submitBtn');
+  btn.disabled = true;
+  btn.querySelector('span').textContent = 'ANALYSING…';
 
   resetPipeline();
   showState('stateLoading');
 
-  const pipeP=animatePipeline();
+  const pipeP = animatePipeline();
 
-  try{
-    const res=await fetch(`${API}/dispute`,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 20000); // 20s timeout
+
+    const res = await fetch(`${API}/dispute`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal: controller.signal,
+      body: JSON.stringify({
         chargeback_id: data.dispute_id,
-        merchant_id:   'MERCH-001',
-        transaction_id:'TXN-001',
-        amount:        data.amount,
-        reason_code:   data.reason_code,
+        merchant_id: 'MERCH-001',
+        transaction_id: 'TXN-001',
+        amount: data.amount,
+        reason_code: data.reason_code,
         reason_description: data.reason_code,
-        merchant:      data.merchant||undefined,
-        txn_date:      data.txn_date||undefined,
-        cardholder:    data.cardholder||undefined,
-        notes:         data.notes||undefined,
+        merchant: data.merchant || undefined,
+        txn_date: data.txn_date || undefined,
+        cardholder: data.cardholder || undefined,
+        notes: data.notes || undefined,
       }),
     });
-    if(!res.ok){
-      const e=await res.json().catch(()=>({}));
-      throw new Error(e.detail||`Server error ${res.status}`);
+
+    clearTimeout(timeout);
+
+    // ✅ Improved error handling
+    if (!res.ok) {
+      let message = `Server error ${res.status}`;
+
+      try {
+        const errData = await res.json();
+        message = errData.detail || message;
+      } catch {
+        const text = await res.text();
+        if (text) message = text;
+      }
+
+      throw new Error(message);
     }
-    const result=await res.json();
-    currentId=data.dispute_id;
+
+    const result = await res.json();
+
+    currentId = data.dispute_id;
+
     await pipeP;
     await delay(300);
-    renderResults(result,data.dispute_id);
+
+    renderResults(result, data.dispute_id);
     showState('stateResults');
-  }catch(e){
-    await pipeP.catch(()=>{});
-    $('errMsg').textContent=e.message.includes('Failed to fetch')
-      ?'Unable to reach the AEGIS API. Ensure the FastAPI server is running on localhost:8000.'
-      :e.message;
+
+  } catch (e) {
+    await pipeP.catch(() => {});
+
+    console.error("Dispute error:", e);
+
+    let msg = e.message;
+
+    if (e.name === "AbortError") {
+      msg = "Request timed out. Please try again.";
+    } else if (msg.includes("Failed to fetch")) {
+      msg = "Unable to reach AEGIS API. Please try again later.";
+    }
+
+    $('errMsg').textContent = msg;
     showState('stateError');
-  }finally{
-    btn.disabled=false;
-    btn.querySelector('span').textContent='LAUNCH DEFENSE ANALYSIS';
+
+  } finally {
+    btn.disabled = false;
+    btn.querySelector('span').textContent = 'LAUNCH DEFENSE ANALYSIS';
   }
 }
 
-async function downloadDoc(id){
-  const btn=$('dlBtn');
-  const orig=btn.innerHTML;
-  btn.textContent='Downloading…';
-  btn.disabled=true;
-  try{
-    const res=await fetch(`${API}/dispute/${id}/download`);
-    if(!res.ok)throw new Error('Download failed');
-    const blob=await res.blob();
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');
-    a.href=url;a.download=id+'.docx';
-    document.body.appendChild(a);a.click();
+
+async function downloadDoc(id) {
+  const btn = $('dlBtn');
+  const orig = btn ? btn.innerHTML : '';
+
+  if (btn) {
+    btn.textContent = 'Downloading…';
+    btn.disabled = true;
+  }
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000); // 15s timeout
+
+    const res = await fetch(`${API}/dispute/${id}/download`, {
+      signal: controller.signal
+    });
+
+    clearTimeout(timeout);
+
+    // ✅ Check response status
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`Download failed (${res.status}): ${text}`);
+    }
+
+    // ✅ Validate content type
+    const contentType = res.headers.get("content-type") || "";
+    if (!contentType.includes("application")) {
+      throw new Error("Invalid file type received");
+    }
+
+    const blob = await res.blob();
+
+    // ✅ Ensure file is not empty
+    if (!blob || blob.size === 0) {
+      throw new Error("Empty file received");
+    }
+
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${id}.docx`;
+    document.body.appendChild(a);
+    a.click();
     document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }catch(e){
-    alert('Download failed: '+e.message);
-  }finally{
-    btn.innerHTML=orig;btn.disabled=false;
+
+    window.URL.revokeObjectURL(url);
+
+  } catch (e) {
+    console.error("Download error:", e);
+
+    if (e.name === "AbortError") {
+      alert("Download timed out. Please try again.");
+    } else {
+      alert("Download failed: " + e.message);
+    }
+
+  } finally {
+    if (btn) {
+      btn.innerHTML = orig;
+      btn.disabled = false;
+    }
   }
 }
+
 
 function resetForm(){
   currentId=null;
