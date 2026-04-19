@@ -10,7 +10,7 @@ app = FastAPI(title="AEGIS", description="Autonomous Chargeback Defense System",
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["https://aegis-zeta-ten.vercel.app/"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
