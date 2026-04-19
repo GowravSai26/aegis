@@ -3,1205 +3,762 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>AEGIS — Autonomous Chargeback Defense</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<title>AEGIS — Chargeback Defense</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
 <style>
-/* ── RESET ── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{font-size:15px;-webkit-font-smoothing:antialiased}
-
-/* ── TOKENS ── */
+html{font-size:14px;-webkit-font-smoothing:antialiased}
 :root{
-  --bg:       #080808;
-  --bg1:      #0c0c0c;
-  --bg2:      #111;
-  --bg3:      #161616;
-  --bg4:      #1c1c1c;
-  --line:     #1e1e1e;
-  --line2:    #252525;
-  --muted:    #333;
-  --dim:      #555;
-  --mid:      #888;
-  --soft:     #bbb;
-  --text:     #e8e8e8;
-  --white:    #ffffff;
-  --font-body:'Syne',sans-serif;
-  --font-mono:'Space Mono',monospace;
-  --topbar:   52px;
+  --black:#0a0a0a;
+  --black2:#111;
+  --black3:#1a1a1a;
+  --white:#ffffff;
+  --off:#f2f2f2;
+  --gray:#888;
+  --gray2:#555;
+  --gray3:#333;
+  --border:#2a2a2a;
+  --border2:#ddd;
+  --font:'Inter',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --bar:52px;
 }
-
-body{
-  background:var(--bg);
-  color:var(--text);
-  font-family:var(--font-body);
-  font-weight:400;
-  line-height:1.5;
-  min-height:100vh;
-  overflow-x:hidden;
-}
-
-/* Scanline texture */
-body::before{
-  content:'';
-  position:fixed;inset:0;
-  background:repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0,0,0,.08) 2px,
-    rgba(0,0,0,.08) 4px
-  );
-  pointer-events:none;
-  z-index:9999;
-  opacity:.4;
-}
+body{background:var(--black);color:var(--white);font-family:var(--font);line-height:1.5;min-height:100vh;overflow-x:hidden}
 
 /* ── TOPBAR ── */
-.topbar{
-  position:fixed;top:0;left:0;right:0;
-  height:var(--topbar);
-  background:rgba(8,8,8,.95);
-  backdrop-filter:blur(12px);
-  border-bottom:1px solid var(--line);
-  display:flex;align-items:center;
-  padding:0 24px;gap:28px;
-  z-index:100;
+.bar{
+  position:fixed;top:0;left:0;right:0;height:var(--bar);
+  background:var(--black);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 32px;gap:24px;z-index:200;
 }
-.logo{display:flex;align-items:center;gap:11px;flex-shrink:0}
-.logo-icon{width:28px;height:28px;flex-shrink:0}
-.logo-text .name{
-  font-family:var(--font-mono);
-  font-size:1rem;font-weight:700;
-  letter-spacing:.2em;
-  color:var(--white);
-  display:block;line-height:1;
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0}
+.brand-icon{
+  width:28px;height:28px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
 }
-.logo-text .sub{
-  font-family:var(--font-mono);
-  font-size:.55rem;
-  letter-spacing:.16em;
-  color:var(--muted);
-  display:block;
-  margin-top:2px;
+.brand-name{font-size:.82rem;font-weight:900;letter-spacing:.18em;color:var(--white)}
+.bar-nav{display:flex;gap:0;flex:1}
+.bar-nav a{
+  font-size:.72rem;font-weight:500;color:var(--gray);
+  text-decoration:none;padding:6px 16px;transition:.12s;letter-spacing:.04em;
+  border-right:1px solid var(--border);
 }
-.topnav{display:flex;gap:2px;flex:1}
-.topnav a{
-  font-family:var(--font-mono);
-  font-size:.68rem;
-  letter-spacing:.08em;
-  color:var(--muted);
-  text-decoration:none;
-  padding:5px 12px;
-  border-radius:3px;
-  transition:color .15s,background .15s;
+.bar-nav a:first-child{border-left:1px solid var(--border)}
+.bar-nav a:hover{color:var(--white);background:var(--black3)}
+.bar-nav a.on{color:var(--white);background:var(--black3)}
+.bar-right{display:flex;align-items:center;gap:0;flex-shrink:0;margin-left:auto}
+.bar-right span{
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.08em;
+  color:var(--gray);border-left:1px solid var(--border);padding:0 16px;
 }
-.topnav a:hover{color:var(--soft);background:var(--bg3)}
-.topnav a.on{color:var(--white);background:var(--bg3)}
-.top-right{display:flex;align-items:center;gap:14px;flex-shrink:0}
-.status{display:flex;align-items:center;gap:7px}
-.status-dot{
-  width:6px;height:6px;border-radius:50%;
-  background:var(--white);
-  animation:pulse 3s infinite;
-}
-@keyframes pulse{
-  0%,100%{opacity:1}
-  50%{opacity:.3}
-}
-.status-text{
-  font-family:var(--font-mono);
-  font-size:.6rem;
-  letter-spacing:.06em;
-  color:var(--dim);
-}
-.api-ver{
-  font-family:var(--font-mono);
-  font-size:.6rem;
-  color:var(--muted);
-  border:1px solid var(--line2);
-  padding:3px 8px;
-  border-radius:3px;
-  letter-spacing:.08em;
-}
+.dot-live{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--white);margin-right:6px;animation:pls 2.5s infinite}
+@keyframes pls{0%,100%{opacity:1}50%{opacity:.2}}
 
-/* ── LAYOUT ── */
-.layout{
+/* ── HERO ── */
+.hero{
+  margin-top:var(--bar);
+  min-height:460px;
   display:grid;
-  grid-template-columns:400px 1fr;
-  min-height:100vh;
-  padding-top:var(--topbar);
+  grid-template-columns:1fr 1fr;
+  border-bottom:1px solid var(--border);
+  position:relative;overflow:hidden;
 }
+.hero-left{
+  padding:64px 56px;
+  display:flex;flex-direction:column;justify-content:center;
+  border-right:1px solid var(--border);
+  position:relative;z-index:2;
+}
+.hero-kicker{font-family:var(--mono);font-size:.6rem;letter-spacing:.22em;color:var(--gray);text-transform:uppercase;margin-bottom:20px}
+.hero-h{font-size:3.2rem;font-weight:900;letter-spacing:-.04em;line-height:1.05;color:var(--white);margin-bottom:20px}
+.hero-h em{font-style:normal;display:block;color:var(--gray)}
+.hero-sub{font-size:.88rem;color:var(--gray);line-height:1.75;max-width:380px;margin-bottom:32px}
+.hero-cta{
+  display:inline-flex;align-items:center;gap:10px;
+  background:var(--white);color:var(--black);
+  padding:12px 28px;font-size:.78rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  border:none;cursor:pointer;transition:.15s;
+  width:fit-content;
+}
+.hero-cta:hover{background:var(--off)}
+.hero-cta .arr{transition:transform .15s}
+.hero-cta:hover .arr{transform:translateX(4px)}
 
-/* ── LEFT PANEL ── */
-.panel-left{
-  background:var(--bg1);
-  border-right:1px solid var(--line);
-  padding:32px 28px;
-  position:sticky;
-  top:var(--topbar);
-  height:calc(100vh - var(--topbar));
-  overflow-y:auto;
+/* Geometric right panel */
+.hero-geo{
+  position:relative;background:var(--black2);
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
 }
-.panel-left::-webkit-scrollbar{width:3px}
-.panel-left::-webkit-scrollbar-thumb{background:var(--line2)}
+.geo-svg{position:absolute;inset:0;width:100%;height:100%}
 
-.panel-eyebrow{
-  font-family:var(--font-mono);
-  font-size:.6rem;
-  letter-spacing:.2em;
-  color:var(--dim);
-  text-transform:uppercase;
-  margin-bottom:6px;
-  display:block;
+/* ── STATS STRIP ── */
+.stats{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  border-bottom:1px solid var(--border);
 }
-.panel-title{
-  font-family:var(--font-body);
-  font-size:1.5rem;
-  font-weight:800;
-  letter-spacing:-.01em;
-  color:var(--white);
-  margin-bottom:5px;
+.stat{
+  padding:28px 32px;border-right:1px solid var(--border);
 }
-.panel-desc{
-  font-size:.82rem;
-  color:var(--dim);
-  line-height:1.6;
-  margin-bottom:26px;
-}
+.stat:last-child{border-right:none}
+.stat-n{font-size:2rem;font-weight:900;letter-spacing:-.03em;color:var(--white);margin-bottom:4px}
+.stat-l{font-family:var(--mono);font-size:.6rem;letter-spacing:.14em;color:var(--gray);text-transform:uppercase}
 
-/* Form */
-.form{display:flex;flex-direction:column;gap:16px}
-.field{display:flex;flex-direction:column;gap:6px}
-.field-row{display:flex;gap:12px}
-.field-row .field{flex:1}
+/* ── MAIN CONTENT ── */
+.content{display:grid;grid-template-columns:1fr 1fr;min-height:calc(100vh - var(--bar) - 460px - 80px)}
 
-label{
-  font-family:var(--font-mono);
-  font-size:.62rem;
-  letter-spacing:.12em;
-  text-transform:uppercase;
-  color:var(--muted);
+/* ── FORM PANEL ── */
+.form-panel{
+  padding:48px 56px;
+  border-right:1px solid var(--border);
 }
-label .opt{
-  font-size:.58rem;
-  letter-spacing:.04em;
-  color:var(--line2);
-  text-transform:none;
-}
+.fp-kicker{font-family:var(--mono);font-size:.58rem;letter-spacing:.2em;color:var(--gray);text-transform:uppercase;margin-bottom:12px}
+.fp-h{font-size:1.6rem;font-weight:900;letter-spacing:-.025em;color:var(--white);margin-bottom:6px}
+.fp-sub{font-size:.8rem;color:var(--gray);line-height:1.65;margin-bottom:32px}
+
+.fields{display:flex;flex-direction:column;gap:18px}
+.f{display:flex;flex-direction:column;gap:7px}
+.frow{display:flex;gap:16px}
+.frow .f{flex:1}
+
+.lbl{font-family:var(--mono);font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gray)}
+.lbl .opt{color:var(--border);text-transform:none;font-size:.56rem;letter-spacing:.04em;margin-left:4px}
 
 input,select,textarea{
-  width:100%;
-  background:var(--bg2);
-  border:1px solid var(--line2);
-  border-radius:4px;
-  padding:9px 11px;
-  font-family:var(--font-body);
-  font-size:.85rem;
-  color:var(--text);
-  outline:none;
-  transition:border-color .15s,background .15s;
-  appearance:none;
+  width:100%;background:transparent;
+  border:none;border-bottom:1px solid var(--border);
+  padding:10px 0;font-family:var(--font);font-size:.85rem;
+  color:var(--white);outline:none;
+  transition:border-color .15s;appearance:none;
+  border-radius:0;
 }
-input::placeholder,textarea::placeholder{color:var(--muted)}
-input:focus,select:focus,textarea:focus{
-  border-color:var(--dim);
-  background:var(--bg3);
-}
+input::placeholder,textarea::placeholder{color:var(--gray2)}
+input:focus,select:focus,textarea:focus{border-bottom-color:var(--white)}
 select{
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23555' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;
-  background-position:right 11px center;
-  padding-right:30px;
-  cursor:pointer;
+  cursor:pointer;padding-right:24px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 4px center;
 }
-select option{background:var(--bg3)}
-textarea{resize:vertical;min-height:72px;line-height:1.5}
+select option{background:var(--black3);color:var(--white)}
+textarea{resize:vertical;min-height:70px;line-height:1.55;padding-top:10px}
+.pre{position:relative}
+.pre-sym{position:absolute;left:0;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:.8rem;color:var(--gray);pointer-events:none}
+.pre input{padding-left:16px}
 
-.prefix-wrap{position:relative}
-.prefix{
-  position:absolute;left:11px;top:50%;transform:translateY(-50%);
-  font-family:var(--font-mono);
-  font-size:.8rem;color:var(--dim);
-  pointer-events:none;
+.cta{
+  width:100%;padding:14px 20px;margin-top:8px;
+  background:var(--white);border:none;
+  color:var(--black);font-family:var(--font);font-size:.78rem;font-weight:800;
+  letter-spacing:.1em;text-transform:uppercase;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  cursor:pointer;transition:background .15s;
 }
-.prefix-wrap input{padding-left:22px}
+.cta:hover{background:var(--off)}
+.cta:disabled{opacity:.3;cursor:not-allowed}
+.cta .carr{margin-left:auto;transition:transform .15s}
+.cta:hover .carr{transform:translateX(4px)}
 
-.submit{
+.form-note{font-family:var(--mono);font-size:.56rem;color:var(--gray2);text-align:center;line-height:1.7;letter-spacing:.03em;margin-top:4px}
+
+/* ── RESULT PANEL ── */
+.result-panel{
   display:flex;align-items:center;justify-content:center;
-  gap:10px;
-  width:100%;
-  padding:12px;
-  background:var(--white);
-  border:none;border-radius:4px;
-  color:#000;
-  font-family:var(--font-mono);
-  font-size:.75rem;
-  font-weight:700;
-  letter-spacing:.12em;
-  cursor:pointer;
-  transition:opacity .2s,transform .15s;
-  margin-top:4px;
   position:relative;overflow:hidden;
-}
-.submit:hover{opacity:.88;transform:translateY(-1px)}
-.submit:active{transform:translateY(0)}
-.submit:disabled{opacity:.35;cursor:not-allowed;transform:none}
-.submit .arrow{margin-left:auto;transition:transform .2s}
-.submit:hover .arrow{transform:translateX(3px)}
-
-.form-note{
-  font-family:var(--font-mono);
-  font-size:.58rem;
-  color:var(--line2);
-  text-align:center;
-  letter-spacing:.04em;
-  line-height:1.6;
+  background:var(--black);
 }
 
-/* ── RIGHT PANEL ── */
-.panel-right{
-  background:var(--bg);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  min-height:calc(100vh - var(--topbar));
-  position:relative;
-  overflow:hidden;
-}
-.panel-right::before{
-  content:'';position:absolute;
-  top:-200px;right:-200px;
-  width:500px;height:500px;
-  background:radial-gradient(circle,rgba(255,255,255,.02) 0%,transparent 70%);
-  pointer-events:none;
-}
+/* geo bg for result panel */
+.rp-geo{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 
-/* ── IDLE STATE ── */
+/* ── IDLE ── */
 .idle{
-  display:flex;flex-direction:column;
-  align-items:center;text-align:center;
-  gap:18px;padding:40px;
-  max-width:480px;
-  z-index:1;
+  display:flex;flex-direction:column;gap:20px;
+  z-index:2;padding:56px;max-width:460px;
 }
-.idle-icon{
-  width:56px;height:56px;
-  border:1px solid var(--line2);
-  border-radius:50%;
+.idle-mark{
+  width:64px;height:64px;background:var(--white);
   display:flex;align-items:center;justify-content:center;
-  animation:float 4s ease-in-out infinite;
+  margin-bottom:8px;
 }
-@keyframes float{
-  0%,100%{transform:translateY(0)}
-  50%{transform:translateY(-8px)}
+.idle-kicker{font-family:var(--mono);font-size:.58rem;letter-spacing:.2em;color:var(--gray);text-transform:uppercase}
+.idle-h{font-size:2rem;font-weight:900;letter-spacing:-.03em;line-height:1.1;color:var(--white)}
+.idle-h em{font-style:normal;color:var(--gray)}
+.idle-body{font-size:.82rem;color:var(--gray);line-height:1.8}
+.agents{display:flex;flex-direction:column;gap:0;border:1px solid var(--border);margin-top:4px}
+.ag-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:9px 14px;border-bottom:1px solid var(--border);
+  font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;color:var(--gray2);
 }
-.idle-eyebrow{
-  font-family:var(--font-mono);
-  font-size:.62rem;
-  letter-spacing:.2em;
-  color:var(--muted);
-  text-transform:uppercase;
-}
-.idle-headline{
-  font-family:var(--font-body);
-  font-size:2.4rem;
-  font-weight:800;
-  color:var(--white);
-  line-height:1.1;
-  letter-spacing:-.02em;
-}
-.idle-headline em{
-  font-style:italic;
-  color:var(--dim);
-}
-.idle-mono{
-  font-family:var(--font-mono);
-  font-size:.68rem;
-  letter-spacing:.12em;
-  color:var(--muted);
-  font-style:italic;
-}
-.idle-desc{
-  font-size:.85rem;
-  color:var(--dim);
-  line-height:1.7;
-  max-width:320px;
-}
-.agent-row{
-  display:flex;align-items:center;
-  gap:5px;flex-wrap:wrap;
-  justify-content:center;
-  margin-top:4px;
-}
-.ag-chip{
-  font-family:var(--font-mono);
-  font-size:.6rem;
-  letter-spacing:.08em;
-  color:var(--dim);
-  border:1px solid var(--line2);
-  padding:3px 9px;
-  border-radius:2px;
-}
-.ag-arrow{color:var(--muted);font-size:.7rem}
+.ag-row:last-child{border-bottom:none}
+.ag-num{color:var(--border);font-size:.56rem}
 
-/* ── LOADING STATE ── */
-.loading{
-  display:flex;flex-direction:column;
-  gap:32px;
-  z-index:1;
-  width:100%;max-width:480px;
-  padding:40px;
+/* ── LOADING ── */
+.loading{display:flex;flex-direction:column;gap:0;z-index:2;width:100%;max-width:460px;margin:56px}
+.load-top{
+  padding:20px 24px;background:var(--black2);border:1px solid var(--border);
+  display:flex;align-items:center;gap:16px;margin-bottom:0;
+  border-bottom:none;
 }
-.load-head{display:flex;align-items:center;gap:18px}
-.spinner{
-  width:32px;height:32px;
-  border:1.5px solid var(--line2);
-  border-top-color:var(--white);
-  border-radius:50%;
-  animation:spin .8s linear infinite;
-  flex-shrink:0;
+.ring{
+  width:20px;height:20px;flex-shrink:0;
+  border:1.5px solid var(--border);border-top-color:var(--white);
+  border-radius:50%;animation:spin .65s linear infinite;
 }
 @keyframes spin{to{transform:rotate(360deg)}}
-.load-title{
-  font-family:var(--font-body);
-  font-size:1.1rem;font-weight:700;
-  color:var(--white);
-  letter-spacing:-.01em;
-}
-.load-sub{
-  font-family:var(--font-mono);
-  font-size:.65rem;
-  color:var(--dim);
-  margin-top:3px;
-  letter-spacing:.04em;
-}
+.load-h{font-size:.88rem;font-weight:700;color:var(--white)}
+.load-s{font-family:var(--mono);font-size:.58rem;color:var(--gray);margin-top:2px;letter-spacing:.04em}
 
-.pipeline{display:flex;flex-direction:column}
-.p-step{
+.pipe{display:flex;flex-direction:column}
+.ps{
   display:flex;align-items:center;gap:14px;
-  padding:11px 14px;
-  border:1px solid var(--line);
-  background:var(--bg1);
-  border-radius:4px;
-  transition:border-color .3s,background .3s;
+  padding:12px 24px;border:1px solid var(--border);border-top:none;
+  background:var(--black);transition:.2s;
 }
-.p-step.active{border-color:var(--dim);background:var(--bg2)}
-.p-step.done{border-color:var(--line2)}
-.p-conn{width:1px;height:6px;background:var(--line);margin-left:20px}
-.p-dot{
-  width:8px;height:8px;
-  border-radius:50%;
-  background:var(--line2);
-  flex-shrink:0;
-  transition:background .3s;
-}
-.p-step.active .p-dot{
-  background:var(--white);
-  animation:blink 1s ease-in-out infinite;
-}
-.p-step.done .p-dot{background:var(--dim)}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-.p-name{
-  font-family:var(--font-body);
-  font-size:.88rem;font-weight:600;
-  color:var(--soft);
-}
-.p-step.active .p-name{color:var(--white)}
-.p-status{
-  font-family:var(--font-mono);
-  font-size:.6rem;
-  color:var(--muted);
-  letter-spacing:.06em;
-}
-.p-step.active .p-status{color:var(--mid)}
-.p-step.done .p-status{color:var(--dim)}
+.ps.active{background:var(--black2)}
+.ps.done{background:var(--black)}
+.pd{width:6px;height:6px;border-radius:50%;background:var(--border);flex-shrink:0;transition:.2s}
+.ps.active .pd{background:var(--white);animation:bk 1s ease-in-out infinite}
+.ps.done .pd{background:var(--gray)}
+@keyframes bk{0%,100%{opacity:1}50%{opacity:.15}}
+.pn{font-size:.84rem;font-weight:600;color:var(--gray2)}
+.ps.active .pn{color:var(--white)}
+.ps.done .pn{color:var(--gray)}
+.pst{font-family:var(--mono);font-size:.56rem;color:var(--gray2);letter-spacing:.06em;margin-top:1px}
+.ps.active .pst{color:var(--gray)}
+.ps.done .pst{color:var(--gray2)}
+.pnum{font-family:var(--mono);font-size:.58rem;color:var(--border);margin-left:auto;letter-spacing:.06em}
+.ps.done .pnum{color:var(--gray2)}
 
-/* ── RESULTS STATE ── */
-.results{
-  width:100%;max-width:540px;
-  padding:40px;
-  z-index:1;
-  display:flex;flex-direction:column;gap:22px;
-  animation:fadeup .4s ease;
+/* ── RESULTS ── */
+.results{width:100%;max-width:460px;z-index:2;display:flex;flex-direction:column;gap:0;animation:up .3s ease;margin:56px}
+@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.res-header{
+  padding:20px 24px;border:1px solid var(--border);border-bottom:none;
+  background:var(--white);display:flex;align-items:center;justify-content:space-between;
 }
-@keyframes fadeup{
-  from{opacity:0;transform:translateY(14px)}
-  to{opacity:1;transform:translateY(0)}
-}
-.results-top{
-  display:flex;align-items:flex-end;
-  justify-content:space-between;
-}
-.results-id{
-  font-family:var(--font-mono);
-  font-size:.62rem;
-  letter-spacing:.14em;
-  color:var(--muted);
-  margin-bottom:4px;
-}
-.results-title{
-  font-family:var(--font-body);
-  font-size:1.6rem;font-weight:800;
-  letter-spacing:-.02em;
-  color:var(--white);
-}
+.res-id{font-family:var(--mono);font-size:.58rem;letter-spacing:.16em;color:var(--gray2)}
+.res-h{font-size:1rem;font-weight:900;letter-spacing:-.01em;color:var(--black);margin-top:2px}
 .btn-new{
-  background:none;
-  border:1px solid var(--line2);
-  color:var(--dim);
-  padding:7px 14px;
-  border-radius:3px;
-  font-family:var(--font-mono);
-  font-size:.62rem;
-  letter-spacing:.06em;
-  cursor:pointer;
-  transition:border-color .15s,color .15s;
+  background:transparent;border:1px solid var(--gray2);color:var(--black);
+  padding:6px 14px;font-size:.68rem;font-weight:600;letter-spacing:.06em;cursor:pointer;transition:.15s;
 }
-.btn-new:hover{border-color:var(--dim);color:var(--soft)}
+.btn-new:hover{background:var(--black);color:var(--white);border-color:var(--black)}
 
-/* Verdict card */
-.verdict-card{
-  background:var(--bg1);
-  border:1px solid var(--line2);
-  border-radius:6px;
-  padding:20px 22px;
-  display:flex;align-items:center;gap:24px;
-  position:relative;overflow:hidden;
+.verdict{
+  border:1px solid var(--border);border-top:none;
+  display:grid;grid-template-columns:1fr 1fr;
 }
-.verdict-card::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:1px;
-  background:var(--white);
+.vblock{padding:20px 24px;display:flex;flex-direction:column;gap:4px}
+.vblock:first-child{border-right:1px solid var(--border)}
+.vlbl{font-family:var(--mono);font-size:.56rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gray)}
+.vbig{font-size:1.6rem;font-weight:900;letter-spacing:.04em;color:var(--white)}
+.vpct{font-size:1.6rem;font-weight:900;letter-spacing:-.01em;color:var(--white)}
+.vbar{height:2px;background:var(--border);margin-top:10px}
+.vfill{height:100%;width:0;background:var(--white);transition:width 1.3s cubic-bezier(.16,1,.3,1)}
+
+.sec{display:flex;flex-direction:column}
+.sec-lbl{
+  font-family:var(--mono);font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--gray);padding:10px 24px;border:1px solid var(--border);border-top:none;
+  background:var(--black2);
 }
-.v-left,.v-right{display:flex;flex-direction:column;gap:6px}
-.v-right{flex:1}
-.v-label{
-  font-family:var(--font-mono);
-  font-size:.58rem;letter-spacing:.14em;
-  text-transform:uppercase;color:var(--muted);
-}
-.v-badge{
-  font-family:var(--font-mono);
-  font-size:1.9rem;font-weight:700;
-  letter-spacing:.1em;color:var(--white);
-}
-.v-divider{width:1px;height:52px;background:var(--line2);flex-shrink:0}
-.v-pct{
-  font-family:var(--font-mono);
-  font-size:1.9rem;font-weight:700;
-  color:var(--white);
-}
-.v-bar{
-  height:3px;
-  background:var(--bg3);
-  border-radius:2px;
-  overflow:hidden;
-  margin-top:6px;
-}
-.v-fill{
-  height:100%;
-  background:var(--white);
-  border-radius:2px;
-  width:0;
-  transition:width 1.2s cubic-bezier(.16,1,.3,1);
+.evg{display:grid;grid-template-columns:1fr 1fr}
+.evc{padding:14px 24px;border:1px solid var(--border);border-top:none}
+.evc:nth-child(odd){border-right:none}
+.evc:nth-child(even){border-left:1px solid var(--border)}
+.evc-name{font-size:.82rem;font-weight:600;color:var(--white)}
+.evc-score{font-family:var(--mono);font-size:.58rem;color:var(--gray);margin-top:3px}
+.evc-score b{color:var(--white);font-weight:500}
+
+.rat{
+  font-size:.8rem;color:var(--gray);line-height:1.8;
+  padding:16px 24px;border:1px solid var(--border);border-top:none;
 }
 
-/* Sections */
-.section{display:flex;flex-direction:column;gap:10px}
-.sec-label{
-  font-family:var(--font-mono);
-  font-size:.6rem;letter-spacing:.14em;
-  text-transform:uppercase;color:var(--mid);
-  padding-bottom:8px;
-  border-bottom:1px solid var(--line);
+.doc{
+  display:flex;align-items:center;gap:14px;
+  padding:14px 24px;border:1px solid var(--border);border-top:none;
 }
-.ev-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.ev-item{
-  background:var(--bg1);
-  border:1px solid var(--line);
-  border-left:1px solid var(--white);
-  border-radius:4px;
-  padding:9px 11px;
-}
-.ev-name{
-  font-family:var(--font-body);
-  font-size:.85rem;font-weight:600;
-  color:var(--soft);
-}
-.ev-score{
-  font-family:var(--font-mono);
-  font-size:.62rem;color:var(--dim);
-  margin-top:2px;
-}
-.ev-score span{color:var(--mid)}
-
-.rationale{
-  font-size:.85rem;
-  color:var(--dim);
-  line-height:1.8;
-  background:var(--bg1);
-  border:1px solid var(--line);
-  border-left:1px solid var(--white);
-  border-radius:4px;
-  padding:12px 14px;
-}
-
-/* Doc card */
-.doc-card{
-  display:flex;align-items:center;gap:12px;
-  background:var(--bg1);
-  border:1px solid var(--line2);
-  border-radius:5px;
-  padding:12px 14px;
-}
-.doc-icon{
-  width:32px;height:32px;
-  background:var(--bg3);
-  border-radius:4px;
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
+.doc-ico{
+  width:32px;height:32px;background:var(--black2);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
 }
 .doc-info{flex:1}
-.doc-name{
-  font-family:var(--font-mono);
-  font-size:.78rem;color:var(--text);
-}
-.doc-meta{font-size:.72rem;color:var(--muted);margin-top:2px}
+.doc-name{font-family:var(--mono);font-size:.72rem;color:var(--white)}
+.doc-meta{font-size:.7rem;color:var(--gray);margin-top:2px}
 .btn-dl{
-  background:none;
-  border:1px solid var(--line2);
-  color:var(--mid);
-  padding:7px 14px;
-  border-radius:3px;
-  font-family:var(--font-mono);
-  font-size:.65rem;
-  letter-spacing:.04em;
-  cursor:pointer;
-  display:flex;align-items:center;gap:6px;
+  background:var(--white);color:var(--black);border:none;
+  padding:8px 16px;font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;
+  font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.15s;
   flex-shrink:0;
-  transition:border-color .15s,color .15s;
 }
-.btn-dl:hover{border-color:var(--dim);color:var(--white)}
+.btn-dl:hover{background:var(--off)}
 
-/* Pipeline complete */
-.pipe-done{
-  display:flex;align-items:center;gap:6px;
-  justify-content:center;
-  flex-wrap:wrap;
-  padding-top:14px;
-  border-top:1px solid var(--line);
+.trail{
+  display:flex;align-items:center;gap:0;
+  border:1px solid var(--border);border-top:none;
 }
-.pd-item{
-  display:flex;align-items:center;gap:5px;
-  font-family:var(--font-mono);
-  font-size:.6rem;
-  letter-spacing:.06em;
-  color:var(--dim);
+.titem{
+  display:flex;align-items:center;gap:6px;flex:1;
+  padding:9px 14px;border-right:1px solid var(--border);
+  font-family:var(--mono);font-size:.56rem;letter-spacing:.08em;color:var(--gray2);
 }
-.pd-dot{
-  width:4px;height:4px;
-  border-radius:50%;
-  background:var(--dim);
-}
-.pd-arrow{color:var(--line2);font-size:.7rem}
+.titem:last-child{border-right:none}
+.tdot{width:4px;height:4px;background:var(--white);flex-shrink:0}
 
-/* ── ERROR STATE ── */
-.error-state{
-  display:flex;flex-direction:column;
-  align-items:center;text-align:center;
-  gap:14px;padding:40px;
-  max-width:420px;z-index:1;
+/* ── ERROR ── */
+.err{
+  display:flex;flex-direction:column;gap:0;z-index:2;
+  width:100%;max-width:400px;margin:56px;
 }
-.err-icon{
-  font-family:var(--font-mono);
-  font-size:1.4rem;color:var(--dim);
+.err-head{
+  padding:20px 24px;background:var(--black2);border:1px solid var(--border);
+  border-bottom:none;
 }
-.err-title{
-  font-family:var(--font-body);
-  font-size:1.2rem;font-weight:700;
-  color:var(--white);
-}
-.err-msg{font-size:.82rem;color:var(--dim);line-height:1.7}
+.err-h{font-size:.9rem;font-weight:700;color:var(--white)}
+.err-b{font-size:.8rem;color:var(--gray);line-height:1.7;padding:16px 24px;border:1px solid var(--border);border-top:none}
 .btn-retry{
-  background:none;border:1px solid var(--line2);
-  color:var(--dim);padding:9px 22px;
-  border-radius:3px;font-family:var(--font-mono);
-  font-size:.7rem;letter-spacing:.06em;cursor:pointer;
-  transition:.15s;
+  background:var(--white);color:var(--black);border:none;
+  padding:12px 24px;font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;
+  font-weight:700;cursor:pointer;transition:.15s;width:100%;text-transform:uppercase;
 }
-.btn-retry:hover{border-color:var(--white);color:var(--white)}
+.btn-retry:hover{background:var(--off)}
 
 /* ── TOAST ── */
 .toast{
-  position:fixed;bottom:24px;left:50%;
-  transform:translateX(-50%);
-  background:var(--bg2);
-  border:1px solid var(--line2);
-  color:var(--soft);
-  padding:10px 20px;border-radius:4px;
-  font-family:var(--font-mono);
-  font-size:.7rem;letter-spacing:.04em;
-  z-index:9998;
-  animation:fadeup .2s ease;
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  background:var(--white);color:var(--black);
+  padding:10px 22px;font-family:var(--mono);font-size:.66rem;letter-spacing:.06em;
+  z-index:9999;animation:up .2s ease;white-space:nowrap;
 }
 
-/* ── UTILITIES ── */
 .hidden{display:none!important}
 
-/* ── RESPONSIVE ── */
-@media(max-width:800px){
-  .layout{grid-template-columns:1fr}
-  .panel-left{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line)}
-  .topnav{display:none}
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr}
+  .hero-geo{display:none}
+  .content{grid-template-columns:1fr}
+  .result-panel{min-height:auto;border-top:1px solid var(--border)}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .bar-nav{display:none}
 }
 </style>
 </head>
 <body>
 
-<!-- ── TOPBAR ── -->
-<header class="topbar">
-  <div class="logo">
-    <svg class="logo-icon" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M14 2L4 6.5V14.5C4 19.75 8.4 24.65 14 26C19.6 24.65 24 19.75 24 14.5V6.5L14 2Z"
-        stroke="#ffffff" stroke-width="1.4" fill="rgba(255,255,255,0.04)"/>
-      <path d="M10 14L13 17L18 11"
-        stroke="#ffffff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    <div class="logo-text">
-      <span class="name">AEGIS</span>
-      <span class="sub">Defense System</span>
+<!-- TOPBAR -->
+<header class="bar">
+  <a class="brand" href="#">
+    <div class="brand-icon">
+      <svg width="18" height="22" viewBox="0 0 18 22" fill="none">
+        <polygon points="9,1 17,6 17,16 9,21 1,16 1,6" stroke="white" stroke-width="1.4" fill="none"/>
+        <path d="M9 7l-3 4h3l-1 4 4-5h-3z" fill="white"/>
+      </svg>
     </div>
-  </div>
-  <nav class="topnav">
+    <span class="brand-name">AEGIS</span>
+  </a>
+  <nav class="bar-nav">
     <a href="#" class="on">Disputes</a>
     <a href="#">History</a>
     <a href="#">Analytics</a>
+    <a href="#">Settings</a>
   </nav>
-  <div class="top-right">
-    <div class="status">
-      <div class="status-dot"></div>
-      <span class="status-text">All Systems Operational</span>
-    </div>
-    <span class="api-ver">API v1.0</span>
+  <div class="bar-right">
+    <span><span class="dot-live"></span>All systems live</span>
+    <span>API v1.0</span>
   </div>
 </header>
 
-<!-- ── MAIN ── -->
-<main class="layout">
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-kicker">Autonomous Chargeback Defense</div>
+    <h1 class="hero-h">Never lose a<br/>dispute again.<br/><em>Ever.</em></h1>
+    <p class="hero-sub">Five specialized agents analyze your chargeback, evaluate evidence, craft a strategy, and deliver a submission-ready response — in seconds.</p>
+    <button class="hero-cta" onclick="document.querySelector('.form-panel').scrollIntoView({behavior:'smooth'})">
+      Submit a Dispute <span class="arr">→</span>
+    </button>
+  </div>
+  <div class="hero-geo">
+    <svg class="geo-svg" viewBox="0 0 600 460" fill="none" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <!-- Dark polygon shapes like the reference -->
+      <polygon points="0,0 600,0 600,460 0,460" fill="#111"/>
+      <polygon points="180,0 600,0 600,320 380,460 80,460" fill="#0a0a0a"/>
+      <polygon points="600,0 600,200 420,0" fill="#1a1a1a"/>
+      <polygon points="0,180 280,0 340,100 160,300" fill="#161616"/>
+      <polygon points="200,460 480,460 600,300 600,460" fill="#151515"/>
+      <polygon points="350,80 520,0 600,80 520,180" fill="#222"/>
+      <polygon points="60,240 200,180 240,300 100,360" fill="#141414"/>
+      <polygon points="400,200 560,160 600,260 480,320" fill="#181818"/>
+      <polygon points="260,360 420,300 460,420 300,460" fill="#1c1c1c"/>
+      <!-- Outlines -->
+      <polygon points="180,0 600,0 600,320 380,460 80,460" fill="none" stroke="#2a2a2a" stroke-width=".7"/>
+      <polygon points="350,80 520,0 600,80 520,180" fill="none" stroke="#333" stroke-width=".5"/>
+      <polygon points="60,240 200,180 240,300 100,360" fill="none" stroke="#252525" stroke-width=".5"/>
+      <!-- White accent triangle -->
+      <polygon points="500,20 580,20 580,90" fill="none" stroke="white" stroke-width="1"/>
+      <polygon points="40,380 100,380 70,440" fill="none" stroke="#333" stroke-width=".8"/>
+      <!-- Small detail shapes -->
+      <rect x="420" y="160" width="12" height="12" fill="none" stroke="#333" stroke-width=".8" transform="rotate(15,426,166)"/>
+      <line x1="300" y1="0" x2="420" y2="460" stroke="#1e1e1e" stroke-width=".5"/>
+      <line x1="500" y1="0" x2="200" y2="460" stroke="#1e1e1e" stroke-width=".5"/>
+    </svg>
+  </div>
+</section>
 
-  <!-- LEFT — INTAKE FORM -->
-  <section class="panel-left">
-    <span class="panel-eyebrow">01 / Intake</span>
-    <h2 class="panel-title">Dispute Intake</h2>
-    <p class="panel-desc">Submit chargeback details for automated analysis and response generation.</p>
+<!-- STATS -->
+<div class="stats">
+  <div class="stat">
+    <div class="stat-n">94%</div>
+    <div class="stat-l">Win Rate</div>
+  </div>
+  <div class="stat">
+    <div class="stat-n">&lt;10s</div>
+    <div class="stat-l">Analysis Time</div>
+  </div>
+  <div class="stat">
+    <div class="stat-n">5</div>
+    <div class="stat-l">Specialized Agents</div>
+  </div>
+  <div class="stat">
+    <div class="stat-n">8</div>
+    <div class="stat-l">Reason Codes</div>
+  </div>
+</div>
 
-    <div class="form">
-      <div class="field">
-        <label for="dispute_id">Dispute ID</label>
-        <input id="dispute_id" type="text" placeholder="e.g. CB-001"/>
+<!-- MAIN CONTENT -->
+<div class="content">
+
+  <!-- FORM -->
+  <div class="form-panel">
+    <div class="fp-kicker">01 — Intake</div>
+    <h2 class="fp-h">Submit Dispute</h2>
+    <p class="fp-sub">Enter chargeback details below. AEGIS runs five agents in sequence — intake, evidence, strategy, writing, and review.</p>
+
+    <div class="fields">
+      <div class="f">
+        <label class="lbl" for="dispute_id">Dispute ID</label>
+        <input id="dispute_id" type="text" placeholder="e.g. CB-2024-001"/>
       </div>
-
-      <div class="field-row">
-        <div class="field">
-          <label for="reason_code">Reason Code</label>
+      <div class="frow">
+        <div class="f">
+          <label class="lbl" for="reason_code">Reason Code</label>
           <select id="reason_code">
             <option value="">Select code…</option>
-            <option value="13.1">13.1 — Merchandise Not Received</option>
+            <option value="13.1">13.1 — Not Received</option>
             <option value="13.3">13.3 — Not as Described</option>
-            <option value="13.7">13.7 — Cancelled Merchandise</option>
+            <option value="13.7">13.7 — Cancelled Merch</option>
             <option value="13.2">13.2 — Cancelled Recurring</option>
             <option value="13.6">13.6 — Credit Not Processed</option>
-            <option value="10.4">10.4 — Fraudulent Transaction</option>
-            <option value="10.5">10.5 — Visa Fraud Monitoring</option>
-            <option value="12.6">12.6 — Duplicate Processing</option>
+            <option value="10.4">10.4 — Fraud</option>
+            <option value="10.5">10.5 — Visa Fraud Monitor</option>
+            <option value="12.6">12.6 — Duplicate</option>
           </select>
         </div>
-        <div class="field">
-          <label for="amount">Amount (USD)</label>
-          <div class="prefix-wrap">
-            <span class="prefix">$</span>
+        <div class="f">
+          <label class="lbl" for="amount">Amount (USD)</label>
+          <div class="pre">
+            <span class="pre-sym">$</span>
             <input id="amount" type="number" min="0" step="0.01" placeholder="0.00"/>
           </div>
         </div>
       </div>
-
-      <div class="field">
-        <label for="merchant">Merchant Name</label>
+      <div class="f">
+        <label class="lbl" for="merchant">Merchant</label>
         <input id="merchant" type="text" placeholder="e.g. Acme Commerce LLC"/>
       </div>
-
-      <div class="field-row">
-        <div class="field">
-          <label for="txn_date">Transaction Date</label>
+      <div class="frow">
+        <div class="f">
+          <label class="lbl" for="txn_date">Transaction Date</label>
           <input id="txn_date" type="date"/>
         </div>
-        <div class="field">
-          <label for="cardholder">Cardholder Name</label>
+        <div class="f">
+          <label class="lbl" for="cardholder">Cardholder</label>
           <input id="cardholder" type="text" placeholder="Full name"/>
         </div>
       </div>
-
-      <div class="field">
-        <label for="notes">Notes <span class="opt">optional</span></label>
-        <textarea id="notes" rows="3" placeholder="Any supplementary context…"></textarea>
+      <div class="f">
+        <label class="lbl" for="notes">Notes <span class="opt">optional</span></label>
+        <textarea id="notes" rows="3" placeholder="Any additional context…"></textarea>
       </div>
-
-      <button class="submit" id="submitBtn" onclick="submitDispute()">
-        <span>LAUNCH DEFENSE ANALYSIS</span>
-        <span class="arrow">→</span>
+      <button class="cta" id="submitBtn" onclick="submitDispute()">
+        <span>Launch Defense Analysis</span>
+        <span class="carr">→</span>
       </button>
-
-      <p class="form-note">All dispute data is processed within your infrastructure.<br/>No data leaves your deployment.</p>
+      <p class="form-note">Processed within your infrastructure · No data leaves your deployment</p>
     </div>
-  </section>
+  </div>
 
-  <!-- RIGHT — RESULTS PANEL -->
-  <section class="panel-right" id="rightPanel">
+  <!-- RESULT PANEL -->
+  <div class="result-panel" id="rightPanel">
+
+    <!-- BG geo -->
+    <svg class="rp-geo" viewBox="0 0 560 600" fill="none" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="0,0 560,0 560,600 0,600" fill="#0a0a0a"/>
+      <polygon points="400,0 560,0 560,200 280,300" fill="#111" stroke="#1e1e1e" stroke-width=".6"/>
+      <polygon points="0,400 200,300 280,500 100,600 0,600" fill="#0d0d0d" stroke="#1e1e1e" stroke-width=".6"/>
+      <polygon points="200,0 400,100 300,250 100,200" fill="#0f0f0f" stroke="#252525" stroke-width=".5"/>
+      <polygon points="350,350 500,280 560,420 480,520 340,480" fill="#111" stroke="#1e1e1e" stroke-width=".5"/>
+      <polygon points="480,40 540,20 560,80 520,100" fill="none" stroke="#2a2a2a" stroke-width=".8"/>
+      <polygon points="20,520 80,500 60,560" fill="none" stroke="#222" stroke-width=".6"/>
+      <line x1="0" y1="300" x2="560" y2="200" stroke="#181818" stroke-width=".5"/>
+      <line x1="280" y1="0" x2="160" y2="600" stroke="#181818" stroke-width=".5"/>
+      <polygon points="500,50 540,50 540,90 500,90" fill="none" stroke="white" stroke-width=".8" transform="rotate(10,520,70)"/>
+    </svg>
 
     <!-- IDLE -->
     <div class="idle" id="stateIdle">
-      <div class="idle-icon">
-        <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
-          <path d="M14 2L4 6.5V14.5C4 19.75 8.4 24.65 14 26C19.6 24.65 24 19.75 24 14.5V6.5L14 2Z"
-            stroke="#333" stroke-width="1.4" fill="rgba(255,255,255,0.02)"/>
-          <path d="M10 14L13 17L18 11"
-            stroke="#444" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+      <div class="idle-mark">
+        <svg width="28" height="32" viewBox="0 0 18 22" fill="none">
+          <polygon points="9,1 17,6 17,16 9,21 1,16 1,6" stroke="#0a0a0a" stroke-width="1.2" fill="none"/>
+          <path d="M9 7l-3 4h3l-1 4 4-5h-3z" fill="#0a0a0a"/>
         </svg>
       </div>
-      <span class="idle-eyebrow">Autonomous Chargeback Defense</span>
-      <h1 class="idle-headline">Never sleeps.<br/><em>Never misses.</em></h1>
-      <span class="idle-mono">— awaiting dispute input —</span>
-      <p class="idle-desc">Five specialized agents analyze, strategize, draft, and review your defense in under 10 seconds.</p>
-      <div class="agent-row">
-        <span class="ag-chip">Intake</span><span class="ag-arrow">→</span>
-        <span class="ag-chip">Evidence</span><span class="ag-arrow">→</span>
-        <span class="ag-chip">Strategy</span><span class="ag-arrow">→</span>
-        <span class="ag-chip">Writer</span><span class="ag-arrow">→</span>
-        <span class="ag-chip">Reviewer</span>
+      <span class="idle-kicker">Awaiting Dispute Input</span>
+      <h2 class="idle-h">Your defense<br/><em>starts here.</em></h2>
+      <p class="idle-body">Fill in the intake form. AEGIS will run a full multi-agent analysis and return a winability score, evidence summary, and a ready-to-submit defense document.</p>
+      <div class="agents">
+        <div class="ag-row"><span>01 — Intake Agent</span><span class="ag-num">Classification</span></div>
+        <div class="ag-row"><span>02 — Evidence Collector</span><span class="ag-num">Data Gathering</span></div>
+        <div class="ag-row"><span>03 — Strategy Agent</span><span class="ag-num">Win Analysis</span></div>
+        <div class="ag-row"><span>04 — Writer Agent</span><span class="ag-num">Response Draft</span></div>
+        <div class="ag-row"><span>05 — Reviewer Agent</span><span class="ag-num">QA &amp; Finalize</span></div>
       </div>
     </div>
 
     <!-- LOADING -->
     <div class="loading hidden" id="stateLoading">
-      <div class="load-head">
-        <div class="spinner"></div>
+      <div class="load-top">
+        <div class="ring"></div>
         <div>
-          <div class="load-title">Running Multi-Agent Analysis</div>
-          <div class="load-sub" id="loadSub">Initializing AEGIS agents…</div>
+          <div class="load-h">Running Multi-Agent Analysis</div>
+          <div class="load-s" id="loadSub">Initializing AEGIS agents…</div>
         </div>
       </div>
-      <div class="pipeline" id="pipeline">
-        <div class="p-step" id="step-intake">
-          <div class="p-dot"></div>
-          <div>
-            <div class="p-name">Intake Agent</div>
-            <div class="p-status">Waiting</div>
-          </div>
+      <div class="pipe">
+        <div class="ps" id="step-intake">
+          <div class="pd"></div>
+          <div style="flex:1"><div class="pn">Intake Agent</div><div class="pst">Waiting</div></div>
+          <span class="pnum">01</span>
         </div>
-        <div class="p-conn"></div>
-        <div class="p-step" id="step-evidence">
-          <div class="p-dot"></div>
-          <div>
-            <div class="p-name">Evidence Collector</div>
-            <div class="p-status">Waiting</div>
-          </div>
+        <div class="ps" id="step-evidence">
+          <div class="pd"></div>
+          <div style="flex:1"><div class="pn">Evidence Collector</div><div class="pst">Waiting</div></div>
+          <span class="pnum">02</span>
         </div>
-        <div class="p-conn"></div>
-        <div class="p-step" id="step-strategy">
-          <div class="p-dot"></div>
-          <div>
-            <div class="p-name">Strategy Agent</div>
-            <div class="p-status">Waiting</div>
-          </div>
+        <div class="ps" id="step-strategy">
+          <div class="pd"></div>
+          <div style="flex:1"><div class="pn">Strategy Agent</div><div class="pst">Waiting</div></div>
+          <span class="pnum">03</span>
         </div>
-        <div class="p-conn"></div>
-        <div class="p-step" id="step-writer">
-          <div class="p-dot"></div>
-          <div>
-            <div class="p-name">Writer Agent</div>
-            <div class="p-status">Waiting</div>
-          </div>
+        <div class="ps" id="step-writer">
+          <div class="pd"></div>
+          <div style="flex:1"><div class="pn">Writer Agent</div><div class="pst">Waiting</div></div>
+          <span class="pnum">04</span>
         </div>
-        <div class="p-conn"></div>
-        <div class="p-step" id="step-reviewer">
-          <div class="p-dot"></div>
-          <div>
-            <div class="p-name">Reviewer Agent</div>
-            <div class="p-status">Waiting</div>
-          </div>
+        <div class="ps" id="step-reviewer">
+          <div class="pd"></div>
+          <div style="flex:1"><div class="pn">Reviewer Agent</div><div class="pst">Waiting</div></div>
+          <span class="pnum">05</span>
         </div>
       </div>
     </div>
 
     <!-- RESULTS -->
     <div class="results hidden" id="stateResults">
-      <div class="results-top">
+      <div class="res-header">
         <div>
-          <div class="results-id" id="resultId">CB-001</div>
-          <div class="results-title">Defense Ready</div>
+          <div class="res-id" id="resultId">CB-001</div>
+          <div class="res-h">Defense Ready</div>
         </div>
-        <button class="btn-new" onclick="resetForm()">New Dispute</button>
+        <button class="btn-new" onclick="resetForm()">+ New</button>
       </div>
-
-      <div class="verdict-card">
-        <div class="v-left">
-          <div class="v-label">Recommended Action</div>
-          <div class="v-badge" id="verdictBadge">FIGHT</div>
+      <div class="verdict">
+        <div class="vblock">
+          <div class="vlbl">Recommendation</div>
+          <div class="vbig" id="verdictBadge">FIGHT</div>
         </div>
-        <div class="v-divider"></div>
-        <div class="v-right">
-          <div class="v-label">Winability Score</div>
-          <div class="v-pct" id="winPct">80%</div>
-          <div class="v-bar"><div class="v-fill" id="winFill"></div></div>
+        <div class="vblock">
+          <div class="vlbl">Winability Score</div>
+          <div class="vpct" id="winPct">80%</div>
+          <div class="vbar"><div class="vfill" id="winFill"></div></div>
         </div>
       </div>
-
-      <div class="section">
-        <div class="sec-label">Evidence Gathered</div>
-        <div class="ev-grid" id="evGrid"></div>
+      <div class="sec">
+        <div class="sec-lbl">Evidence Gathered</div>
+        <div class="evg" id="evGrid"></div>
       </div>
-
-      <div class="section">
-        <div class="sec-label">Strategy Rationale</div>
-        <div class="rationale" id="rationale">—</div>
+      <div class="sec">
+        <div class="sec-lbl">Strategy Rationale</div>
+        <div class="rat" id="rationale">—</div>
       </div>
-
-      <div class="section">
-        <div class="sec-label">Generated Response Document</div>
-        <div class="doc-card">
-          <div class="doc-icon">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M3 2h7l3 3v9H3V2z" stroke="#555" stroke-width="1.2" fill="none"/>
-              <path d="M10 2v3h3" stroke="#555" stroke-width="1.2"/>
-              <path d="M5 8h6M5 11h4" stroke="#555" stroke-width="1" stroke-linecap="round"/>
+      <div class="sec">
+        <div class="sec-lbl">Response Document</div>
+        <div class="doc">
+          <div class="doc-ico">
+            <svg width="14" height="16" viewBox="0 0 14 16" fill="none">
+              <path d="M2 1h8l3 3v11H2V1z" stroke="white" stroke-width="1" fill="none"/>
+              <path d="M10 1v3h3" stroke="white" stroke-width="1"/>
+              <path d="M4 7h6M4 10h5M4 13h3" stroke="white" stroke-width=".8" stroke-linecap="round"/>
             </svg>
           </div>
           <div class="doc-info">
             <div class="doc-name" id="docName">CB-001.docx</div>
-            <div class="doc-meta">Formatted dispute response · Ready to submit</div>
+            <div class="doc-meta">Formatted · Ready to submit</div>
           </div>
           <button class="btn-dl" id="dlBtn">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-              <path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+              <path d="M5.5 1v6M3 5l2.5 2.5L8 5M1 9.5h9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
             Download
           </button>
         </div>
       </div>
-
-      <div class="pipe-done">
-        <div class="pd-item"><span class="pd-dot"></span>Intake</div><span class="pd-arrow">→</span>
-        <div class="pd-item"><span class="pd-dot"></span>Evidence</div><span class="pd-arrow">→</span>
-        <div class="pd-item"><span class="pd-dot"></span>Strategy</div><span class="pd-arrow">→</span>
-        <div class="pd-item"><span class="pd-dot"></span>Writer</div><span class="pd-arrow">→</span>
-        <div class="pd-item"><span class="pd-dot"></span>Reviewer</div>
+      <div class="trail">
+        <div class="titem"><span class="tdot"></span>Intake</div>
+        <div class="titem"><span class="tdot"></span>Evidence</div>
+        <div class="titem"><span class="tdot"></span>Strategy</div>
+        <div class="titem"><span class="tdot"></span>Writer</div>
+        <div class="titem"><span class="tdot"></span>Review</div>
       </div>
     </div>
 
     <!-- ERROR -->
-    <div class="error-state hidden" id="stateError">
-      <div class="err-icon">⊘</div>
-      <div class="err-title">Analysis Failed</div>
-      <p class="err-msg" id="errMsg">Unable to connect to AEGIS API. Ensure the FastAPI server is running on localhost:8000.</p>
-      <button class="btn-retry" onclick="resetForm()">Try Again</button>
+    <div class="err hidden" id="stateError">
+      <div class="err-head">
+        <div class="err-h">Analysis Failed</div>
+      </div>
+      <div class="err-b" id="errMsg">Unable to connect to the AEGIS API. Please check the server and try again.</div>
+      <button class="btn-retry" onclick="resetForm()">Try Again →</button>
     </div>
 
-  </section>
-</main>
+  </div>
+</div>
 
 <script>
-const API = 'https://aegis-production-1d9a.up.railway.app';
-let currentId = null;
+const API='https://aegis-production-1d9a.up.railway.app';
+let currentId=null;
+const $=id=>document.getElementById(id);
 
-const $ = id => document.getElementById(id);
-
-const STEPS = [
-  {id:'step-intake',    sub:'Classifying dispute & urgency…',           delay:850},
-  {id:'step-evidence',  sub:'Gathering order, delivery & auth records…', delay:1300},
-  {id:'step-strategy',  sub:'Evaluating winability & strategy…',         delay:750},
-  {id:'step-writer',    sub:'Drafting formal dispute response…',          delay:1100},
-  {id:'step-reviewer',  sub:'Reviewing and finalising document…',         delay:650},
+const STEPS=[
+  {id:'step-intake',  sub:'Classifying dispute & urgency…',            delay:850},
+  {id:'step-evidence',sub:'Gathering order, delivery & auth records…', delay:1300},
+  {id:'step-strategy',sub:'Evaluating winability & strategy…',          delay:750},
+  {id:'step-writer',  sub:'Drafting formal dispute response…',           delay:1100},
+  {id:'step-reviewer',sub:'Reviewing and finalising document…',          delay:650},
 ];
 
-function showState(name){
-  ['stateIdle','stateLoading','stateResults','stateError'].forEach(id=>{
-    $(id).classList.add('hidden');
-  });
-  $(name).classList.remove('hidden');
-}
-
+function showState(n){['stateIdle','stateLoading','stateResults','stateError'].forEach(id=>$(id).classList.add('hidden'));$(n).classList.remove('hidden')}
 function delay(ms){return new Promise(r=>setTimeout(r,ms))}
-
-function resetPipeline(){
-  STEPS.forEach(s=>{
-    const el=$(s.id);
-    el.classList.remove('active','done');
-    el.querySelector('.p-status').textContent='Waiting';
-  });
-}
+function resetPipeline(){STEPS.forEach(s=>{const el=$(s.id);el.classList.remove('active','done');el.querySelector('.pst').textContent='Waiting'})}
 
 async function animatePipeline(){
   for(let i=0;i<STEPS.length;i++){
     const s=STEPS[i];
-    if(i>0){
-      const prev=$(STEPS[i-1].id);
-      prev.classList.remove('active');
-      prev.classList.add('done');
-      prev.querySelector('.p-status').textContent='Complete ✓';
-    }
-    const el=$(s.id);
-    el.classList.add('active');
-    el.querySelector('.p-status').textContent='Running…';
-    $('loadSub').textContent=s.sub;
-    await delay(s.delay);
+    if(i>0){const p=$(STEPS[i-1].id);p.classList.remove('active');p.classList.add('done');p.querySelector('.pst').textContent='Complete ✓'}
+    const el=$(s.id);el.classList.add('active');el.querySelector('.pst').textContent='Running…';
+    $('loadSub').textContent=s.sub;await delay(s.delay);
   }
-  const last=$(STEPS[STEPS.length-1].id);
-  last.classList.remove('active');
-  last.classList.add('done');
-  last.querySelector('.p-status').textContent='Complete ✓';
+  const l=$(STEPS[STEPS.length-1].id);l.classList.remove('active');l.classList.add('done');l.querySelector('.pst').textContent='Complete ✓';
   $('loadSub').textContent='Finalising response…';
 }
 
 function collectForm(){
   const v=id=>($(id)?.value||'').trim();
-  return{
-    dispute_id:  v('dispute_id'),
-    reason_code: v('reason_code'),
-    amount:      parseFloat(v('amount'))||0,
-    merchant:    v('merchant'),
-    txn_date:    v('txn_date'),
-    cardholder:  v('cardholder'),
-    notes:       v('notes'),
-  };
+  return{dispute_id:v('dispute_id'),reason_code:v('reason_code'),amount:parseFloat(v('amount'))||0,merchant:v('merchant'),txn_date:v('txn_date'),cardholder:v('cardholder'),notes:v('notes')};
 }
-
 function validate(d){
-  if(!d.dispute_id)  return'Please enter a Dispute ID.';
-  if(!d.reason_code) return'Please select a Reason Code.';
-  if(!d.amount||d.amount<=0) return'Please enter a valid amount.';
+  if(!d.dispute_id)return'Please enter a Dispute ID.';
+  if(!d.reason_code)return'Please select a Reason Code.';
+  if(!d.amount||d.amount<=0)return'Please enter a valid amount.';
   return null;
 }
 
-function renderResults(data, id){
+function renderResults(data,id){
   $('resultId').textContent=id;
-
   const verdict=(data.verdict||'FIGHT').toUpperCase();
   $('verdictBadge').textContent=verdict;
-
-  const verdictColors={FIGHT:'#4ade80',ACCEPT:'#facc15',ESCALATE:'#f87171'};
-  $('verdictBadge').style.color=verdictColors[verdict]||'#fff';
-
   const raw=data.winability_score??0.8;
-  const pct=Math.round((raw<=1?raw*100:raw));
+  const pct=Math.round(raw<=1?raw*100:raw);
   $('winPct').textContent=pct+'%';
-  setTimeout(()=>{ $('winFill').style.width=pct+'%'; },120);
-
-  const grid=$('evGrid');
-  grid.innerHTML='';
+  setTimeout(()=>{$('winFill').style.width=pct+'%'},120);
+  const grid=$('evGrid');grid.innerHTML='';
   const ev=data.evidence_collected||{};
   if(Object.keys(ev).length){
     Object.entries(ev).forEach(([k,v])=>{
       const score=typeof v==='number'?v:(v?.strength??v?.score??null);
       const label=k.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
       const scoreStr=score!==null?Math.round(score*100)+'%':'Present';
-      grid.innerHTML+=`<div class="ev-item">
-        <div class="ev-name">${label}</div>
-        <div class="ev-score">Score: <span>${scoreStr}</span></div>
-      </div>`;
+      grid.innerHTML+=`<div class="evc"><div class="evc-name">${label}</div><div class="evc-score">Score: <b>${scoreStr}</b></div></div>`;
     });
-  } else {
+  }else{
     ['Order Lookup','Delivery Proof','Device Fingerprint','Auth History'].forEach(n=>{
-      grid.innerHTML+=`<div class="ev-item">
-        <div class="ev-name">${n}</div>
-        <div class="ev-score">Score: <span>Collected</span></div>
-      </div>`;
+      grid.innerHTML+=`<div class="evc"><div class="evc-name">${n}</div><div class="evc-score">Score: <b>Collected</b></div></div>`;
     });
   }
-
-  $('rationale').textContent=data.strategy_reasoning||data.rationale||
-    'AEGIS has completed its multi-agent analysis. The recommendation above reflects evidence strength, reason code risk profile, and dispute strategy.';
-
+  $('rationale').textContent=data.strategy_reasoning||data.rationale||'AEGIS completed its multi-agent analysis. The recommendation reflects evidence strength, reason code risk profile, and dispute strategy.';
   $('docName').textContent=id+'.docx';
   $('dlBtn').onclick=()=>downloadDoc(id);
 }
 
-async function submitDispute() {
-  const data = collectForm();
-  const err = validate(data);
-  if (err) {
-    toast(err);
-    return;
-  }
-
-  const btn = $('submitBtn');
-  btn.disabled = true;
-  btn.querySelector('span').textContent = 'ANALYSING…';
-
-  resetPipeline();
-  showState('stateLoading');
-
-  const pipeP = animatePipeline();
-
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 20000); // 20s timeout
-
-    const res = await fetch(`${API}/dispute`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      signal: controller.signal,
-      body: JSON.stringify({
-        chargeback_id: data.dispute_id,
-        merchant_id: 'MERCH-001',
-        transaction_id: 'TXN-001',
-        amount: data.amount,
-        reason_code: data.reason_code,
-        reason_description: data.reason_code,
-        merchant: data.merchant || undefined,
-        txn_date: data.txn_date || undefined,
-        cardholder: data.cardholder || undefined,
-        notes: data.notes || undefined,
-      }),
-    });
-
-    clearTimeout(timeout);
-
-    // ✅ Improved error handling
-    if (!res.ok) {
-      let message = `Server error ${res.status}`;
-
-      try {
-        const errData = await res.json();
-        message = errData.detail || message;
-      } catch {
-        const text = await res.text();
-        if (text) message = text;
-      }
-
-      throw new Error(message);
-    }
-
-    const result = await res.json();
-
-    currentId = data.dispute_id;
-
-    await pipeP;
-    await delay(300);
-
-    renderResults(result, data.dispute_id);
-    showState('stateResults');
-
-  } catch (e) {
-    await pipeP.catch(() => {});
-
-    console.error("Dispute error:", e);
-
-    let msg = e.message;
-
-    if (e.name === "AbortError") {
-      msg = "Request timed out. Please try again.";
-    } else if (msg.includes("Failed to fetch")) {
-      msg = "Unable to reach AEGIS API. Please try again later.";
-    }
-
-    $('errMsg').textContent = msg;
-    showState('stateError');
-
-  } finally {
-    btn.disabled = false;
-    btn.querySelector('span').textContent = 'LAUNCH DEFENSE ANALYSIS';
-  }
+async function submitDispute(){
+  const data=collectForm();const err=validate(data);
+  if(err){toast(err);return;}
+  const btn=$('submitBtn');btn.disabled=true;btn.querySelector('span').textContent='Analysing…';
+  resetPipeline();showState('stateLoading');
+  const pipeP=animatePipeline();
+  try{
+    const ctrl=new AbortController();const t=setTimeout(()=>ctrl.abort(),20000);
+    const res=await fetch(`${API}/dispute`,{method:'POST',headers:{'Content-Type':'application/json'},signal:ctrl.signal,
+      body:JSON.stringify({chargeback_id:data.dispute_id,merchant_id:'MERCH-001',transaction_id:'TXN-001',amount:data.amount,reason_code:data.reason_code,reason_description:data.reason_code,merchant:data.merchant||undefined,txn_date:data.txn_date||undefined,cardholder:data.cardholder||undefined,notes:data.notes||undefined})});
+    clearTimeout(t);
+    if(!res.ok){let m=`Server error ${res.status}`;try{const e=await res.json();m=e.detail||m}catch{const tx=await res.text();if(tx)m=tx}throw new Error(m)}
+    const result=await res.json();currentId=data.dispute_id;
+    await pipeP;await delay(300);
+    renderResults(result,data.dispute_id);showState('stateResults');
+  }catch(e){
+    await pipeP.catch(()=>{});
+    let msg=e.message;
+    if(e.name==='AbortError')msg='Request timed out. Please try again.';
+    else if(msg.includes('Failed to fetch'))msg='Unable to reach AEGIS API. Please try again later.';
+    $('errMsg').textContent=msg;showState('stateError');
+  }finally{btn.disabled=false;btn.querySelector('span').textContent='Launch Defense Analysis';}
 }
 
-
-async function downloadDoc(id) {
-  const btn = $('dlBtn');
-  const orig = btn ? btn.innerHTML : '';
-
-  if (btn) {
-    btn.textContent = 'Downloading…';
-    btn.disabled = true;
-  }
-
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 15000); // 15s timeout
-
-    const res = await fetch(`${API}/dispute/${id}/download`, {
-      signal: controller.signal
-    });
-
-    clearTimeout(timeout);
-
-    // ✅ Check response status
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error(`Download failed (${res.status}): ${text}`);
-    }
-
-    // ✅ Validate content type
-    const contentType = res.headers.get("content-type") || "";
-    if (!contentType.includes("application")) {
-      throw new Error("Invalid file type received");
-    }
-
-    const blob = await res.blob();
-
-    // ✅ Ensure file is not empty
-    if (!blob || blob.size === 0) {
-      throw new Error("Empty file received");
-    }
-
-    const url = window.URL.createObjectURL(blob);
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${id}.docx`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-
-    window.URL.revokeObjectURL(url);
-
-  } catch (e) {
-    console.error("Download error:", e);
-
-    if (e.name === "AbortError") {
-      alert("Download timed out. Please try again.");
-    } else {
-      alert("Download failed: " + e.message);
-    }
-
-  } finally {
-    if (btn) {
-      btn.innerHTML = orig;
-      btn.disabled = false;
-    }
-  }
+async function downloadDoc(id){
+  const btn=$('dlBtn');const orig=btn?.innerHTML||'';
+  if(btn){btn.textContent='Downloading…';btn.disabled=true}
+  try{
+    const ctrl=new AbortController();const t=setTimeout(()=>ctrl.abort(),15000);
+    const res=await fetch(`${API}/dispute/${id}/download`,{signal:ctrl.signal});clearTimeout(t);
+    if(!res.ok){const tx=await res.text();throw new Error(`Download failed (${res.status}): ${tx}`)}
+    const ct=res.headers.get('content-type')||'';
+    if(!ct.includes('application'))throw new Error('Invalid file type received');
+    const blob=await res.blob();
+    if(!blob||blob.size===0)throw new Error('Empty file received');
+    const url=window.URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download=`${id}.docx`;
+    document.body.appendChild(a);a.click();document.body.removeChild(a);window.URL.revokeObjectURL(url);
+  }catch(e){
+    if(e.name==='AbortError')alert('Download timed out. Please try again.');
+    else alert('Download failed: '+e.message);
+  }finally{if(btn){btn.innerHTML=orig;btn.disabled=false}}
 }
-
 
 function resetForm(){
-  currentId=null;
-  showState('stateIdle');
-  ['dispute_id','reason_code','amount','merchant','txn_date','cardholder','notes']
-    .forEach(id=>{const el=$(id);if(el)el.value=''});
+  currentId=null;showState('stateIdle');
+  ['dispute_id','reason_code','amount','merchant','txn_date','cardholder','notes'].forEach(id=>{const el=$(id);if(el)el.value=''});
 }
 
 function toast(msg){
-  const t=document.querySelector('.toast');
-  if(t)t.remove();
-  const el=document.createElement('div');
-  el.className='toast';
-  el.textContent=msg;
-  document.body.appendChild(el);
-  setTimeout(()=>el.remove(),3200);
+  const old=document.querySelector('.toast');if(old)old.remove();
+  const el=document.createElement('div');el.className='toast';el.textContent=msg;
+  document.body.appendChild(el);setTimeout(()=>el.remove(),3000);
 }
 
-document.addEventListener('keydown',e=>{
-  if((e.metaKey||e.ctrlKey)&&e.key==='Enter')submitDispute();
-});
+document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key==='Enter')submitDispute()});
 </script>
 </body>
 </html>
