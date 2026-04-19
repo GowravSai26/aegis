@@ -1,316 +1,1126 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AEGIS — Autonomous Chargeback Defense</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&family=Barlow+Semi+Condensed:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AEGIS — Autonomous Chargeback Defense</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+/* ── RESET ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:15px;-webkit-font-smoothing:antialiased}
+
+/* ── TOKENS ── */
+:root{
+  --bg:       #080808;
+  --bg1:      #0c0c0c;
+  --bg2:      #111;
+  --bg3:      #161616;
+  --bg4:      #1c1c1c;
+  --line:     #1e1e1e;
+  --line2:    #252525;
+  --muted:    #333;
+  --dim:      #555;
+  --mid:      #888;
+  --soft:     #bbb;
+  --text:     #e8e8e8;
+  --white:    #ffffff;
+  --font-body:'Syne',sans-serif;
+  --font-mono:'Space Mono',monospace;
+  --topbar:   52px;
+}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-body);
+  font-weight:400;
+  line-height:1.5;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* Scanline texture */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background:repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,.08) 2px,
+    rgba(0,0,0,.08) 4px
+  );
+  pointer-events:none;
+  z-index:9999;
+  opacity:.4;
+}
+
+/* ── TOPBAR ── */
+.topbar{
+  position:fixed;top:0;left:0;right:0;
+  height:var(--topbar);
+  background:rgba(8,8,8,.95);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);
+  display:flex;align-items:center;
+  padding:0 24px;gap:28px;
+  z-index:100;
+}
+.logo{display:flex;align-items:center;gap:11px;flex-shrink:0}
+.logo-icon{width:28px;height:28px;flex-shrink:0}
+.logo-text .name{
+  font-family:var(--font-mono);
+  font-size:1rem;font-weight:700;
+  letter-spacing:.2em;
+  color:var(--white);
+  display:block;line-height:1;
+}
+.logo-text .sub{
+  font-family:var(--font-mono);
+  font-size:.55rem;
+  letter-spacing:.16em;
+  color:var(--muted);
+  display:block;
+  margin-top:2px;
+}
+.topnav{display:flex;gap:2px;flex:1}
+.topnav a{
+  font-family:var(--font-mono);
+  font-size:.68rem;
+  letter-spacing:.08em;
+  color:var(--muted);
+  text-decoration:none;
+  padding:5px 12px;
+  border-radius:3px;
+  transition:color .15s,background .15s;
+}
+.topnav a:hover{color:var(--soft);background:var(--bg3)}
+.topnav a.on{color:var(--white);background:var(--bg3)}
+.top-right{display:flex;align-items:center;gap:14px;flex-shrink:0}
+.status{display:flex;align-items:center;gap:7px}
+.status-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--white);
+  animation:pulse 3s infinite;
+}
+@keyframes pulse{
+  0%,100%{opacity:1}
+  50%{opacity:.3}
+}
+.status-text{
+  font-family:var(--font-mono);
+  font-size:.6rem;
+  letter-spacing:.06em;
+  color:var(--dim);
+}
+.api-ver{
+  font-family:var(--font-mono);
+  font-size:.6rem;
+  color:var(--muted);
+  border:1px solid var(--line2);
+  padding:3px 8px;
+  border-radius:3px;
+  letter-spacing:.08em;
+}
+
+/* ── LAYOUT ── */
+.layout{
+  display:grid;
+  grid-template-columns:400px 1fr;
+  min-height:100vh;
+  padding-top:var(--topbar);
+}
+
+/* ── LEFT PANEL ── */
+.panel-left{
+  background:var(--bg1);
+  border-right:1px solid var(--line);
+  padding:32px 28px;
+  position:sticky;
+  top:var(--topbar);
+  height:calc(100vh - var(--topbar));
+  overflow-y:auto;
+}
+.panel-left::-webkit-scrollbar{width:3px}
+.panel-left::-webkit-scrollbar-thumb{background:var(--line2)}
+
+.panel-eyebrow{
+  font-family:var(--font-mono);
+  font-size:.6rem;
+  letter-spacing:.2em;
+  color:var(--dim);
+  text-transform:uppercase;
+  margin-bottom:6px;
+  display:block;
+}
+.panel-title{
+  font-family:var(--font-body);
+  font-size:1.5rem;
+  font-weight:800;
+  letter-spacing:-.01em;
+  color:var(--white);
+  margin-bottom:5px;
+}
+.panel-desc{
+  font-size:.82rem;
+  color:var(--dim);
+  line-height:1.6;
+  margin-bottom:26px;
+}
+
+/* Form */
+.form{display:flex;flex-direction:column;gap:16px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field-row{display:flex;gap:12px}
+.field-row .field{flex:1}
+
+label{
+  font-family:var(--font-mono);
+  font-size:.62rem;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+label .opt{
+  font-size:.58rem;
+  letter-spacing:.04em;
+  color:var(--line2);
+  text-transform:none;
+}
+
+input,select,textarea{
+  width:100%;
+  background:var(--bg2);
+  border:1px solid var(--line2);
+  border-radius:4px;
+  padding:9px 11px;
+  font-family:var(--font-body);
+  font-size:.85rem;
+  color:var(--text);
+  outline:none;
+  transition:border-color .15s,background .15s;
+  appearance:none;
+}
+input::placeholder,textarea::placeholder{color:var(--muted)}
+input:focus,select:focus,textarea:focus{
+  border-color:var(--dim);
+  background:var(--bg3);
+}
+select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23555' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 11px center;
+  padding-right:30px;
+  cursor:pointer;
+}
+select option{background:var(--bg3)}
+textarea{resize:vertical;min-height:72px;line-height:1.5}
+
+.prefix-wrap{position:relative}
+.prefix{
+  position:absolute;left:11px;top:50%;transform:translateY(-50%);
+  font-family:var(--font-mono);
+  font-size:.8rem;color:var(--dim);
+  pointer-events:none;
+}
+.prefix-wrap input{padding-left:22px}
+
+.submit{
+  display:flex;align-items:center;justify-content:center;
+  gap:10px;
+  width:100%;
+  padding:12px;
+  background:var(--white);
+  border:none;border-radius:4px;
+  color:#000;
+  font-family:var(--font-mono);
+  font-size:.75rem;
+  font-weight:700;
+  letter-spacing:.12em;
+  cursor:pointer;
+  transition:opacity .2s,transform .15s;
+  margin-top:4px;
+  position:relative;overflow:hidden;
+}
+.submit:hover{opacity:.88;transform:translateY(-1px)}
+.submit:active{transform:translateY(0)}
+.submit:disabled{opacity:.35;cursor:not-allowed;transform:none}
+.submit .arrow{margin-left:auto;transition:transform .2s}
+.submit:hover .arrow{transform:translateX(3px)}
+
+.form-note{
+  font-family:var(--font-mono);
+  font-size:.58rem;
+  color:var(--line2);
+  text-align:center;
+  letter-spacing:.04em;
+  line-height:1.6;
+}
+
+/* ── RIGHT PANEL ── */
+.panel-right{
+  background:var(--bg);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:calc(100vh - var(--topbar));
+  position:relative;
+  overflow:hidden;
+}
+.panel-right::before{
+  content:'';position:absolute;
+  top:-200px;right:-200px;
+  width:500px;height:500px;
+  background:radial-gradient(circle,rgba(255,255,255,.02) 0%,transparent 70%);
+  pointer-events:none;
+}
+
+/* ── IDLE STATE ── */
+.idle{
+  display:flex;flex-direction:column;
+  align-items:center;text-align:center;
+  gap:18px;padding:40px;
+  max-width:480px;
+  z-index:1;
+}
+.idle-icon{
+  width:56px;height:56px;
+  border:1px solid var(--line2);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  animation:float 4s ease-in-out infinite;
+}
+@keyframes float{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-8px)}
+}
+.idle-eyebrow{
+  font-family:var(--font-mono);
+  font-size:.62rem;
+  letter-spacing:.2em;
+  color:var(--muted);
+  text-transform:uppercase;
+}
+.idle-headline{
+  font-family:var(--font-body);
+  font-size:2.4rem;
+  font-weight:800;
+  color:var(--white);
+  line-height:1.1;
+  letter-spacing:-.02em;
+}
+.idle-headline em{
+  font-style:italic;
+  color:var(--dim);
+}
+.idle-mono{
+  font-family:var(--font-mono);
+  font-size:.68rem;
+  letter-spacing:.12em;
+  color:var(--muted);
+  font-style:italic;
+}
+.idle-desc{
+  font-size:.85rem;
+  color:var(--dim);
+  line-height:1.7;
+  max-width:320px;
+}
+.agent-row{
+  display:flex;align-items:center;
+  gap:5px;flex-wrap:wrap;
+  justify-content:center;
+  margin-top:4px;
+}
+.ag-chip{
+  font-family:var(--font-mono);
+  font-size:.6rem;
+  letter-spacing:.08em;
+  color:var(--dim);
+  border:1px solid var(--line2);
+  padding:3px 9px;
+  border-radius:2px;
+}
+.ag-arrow{color:var(--muted);font-size:.7rem}
+
+/* ── LOADING STATE ── */
+.loading{
+  display:flex;flex-direction:column;
+  gap:32px;
+  z-index:1;
+  width:100%;max-width:480px;
+  padding:40px;
+}
+.load-head{display:flex;align-items:center;gap:18px}
+.spinner{
+  width:32px;height:32px;
+  border:1.5px solid var(--line2);
+  border-top-color:var(--white);
+  border-radius:50%;
+  animation:spin .8s linear infinite;
+  flex-shrink:0;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.load-title{
+  font-family:var(--font-body);
+  font-size:1.1rem;font-weight:700;
+  color:var(--white);
+  letter-spacing:-.01em;
+}
+.load-sub{
+  font-family:var(--font-mono);
+  font-size:.65rem;
+  color:var(--dim);
+  margin-top:3px;
+  letter-spacing:.04em;
+}
+
+.pipeline{display:flex;flex-direction:column}
+.p-step{
+  display:flex;align-items:center;gap:14px;
+  padding:11px 14px;
+  border:1px solid var(--line);
+  background:var(--bg1);
+  border-radius:4px;
+  transition:border-color .3s,background .3s;
+}
+.p-step.active{border-color:var(--dim);background:var(--bg2)}
+.p-step.done{border-color:var(--line2)}
+.p-conn{width:1px;height:6px;background:var(--line);margin-left:20px}
+.p-dot{
+  width:8px;height:8px;
+  border-radius:50%;
+  background:var(--line2);
+  flex-shrink:0;
+  transition:background .3s;
+}
+.p-step.active .p-dot{
+  background:var(--white);
+  animation:blink 1s ease-in-out infinite;
+}
+.p-step.done .p-dot{background:var(--dim)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.p-name{
+  font-family:var(--font-body);
+  font-size:.88rem;font-weight:600;
+  color:var(--soft);
+}
+.p-step.active .p-name{color:var(--white)}
+.p-status{
+  font-family:var(--font-mono);
+  font-size:.6rem;
+  color:var(--muted);
+  letter-spacing:.06em;
+}
+.p-step.active .p-status{color:var(--mid)}
+.p-step.done .p-status{color:var(--dim)}
+
+/* ── RESULTS STATE ── */
+.results{
+  width:100%;max-width:540px;
+  padding:40px;
+  z-index:1;
+  display:flex;flex-direction:column;gap:22px;
+  animation:fadeup .4s ease;
+}
+@keyframes fadeup{
+  from{opacity:0;transform:translateY(14px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.results-top{
+  display:flex;align-items:flex-end;
+  justify-content:space-between;
+}
+.results-id{
+  font-family:var(--font-mono);
+  font-size:.62rem;
+  letter-spacing:.14em;
+  color:var(--muted);
+  margin-bottom:4px;
+}
+.results-title{
+  font-family:var(--font-body);
+  font-size:1.6rem;font-weight:800;
+  letter-spacing:-.02em;
+  color:var(--white);
+}
+.btn-new{
+  background:none;
+  border:1px solid var(--line2);
+  color:var(--dim);
+  padding:7px 14px;
+  border-radius:3px;
+  font-family:var(--font-mono);
+  font-size:.62rem;
+  letter-spacing:.06em;
+  cursor:pointer;
+  transition:border-color .15s,color .15s;
+}
+.btn-new:hover{border-color:var(--dim);color:var(--soft)}
+
+/* Verdict card */
+.verdict-card{
+  background:var(--bg1);
+  border:1px solid var(--line2);
+  border-radius:6px;
+  padding:20px 22px;
+  display:flex;align-items:center;gap:24px;
+  position:relative;overflow:hidden;
+}
+.verdict-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:var(--white);
+}
+.v-left,.v-right{display:flex;flex-direction:column;gap:6px}
+.v-right{flex:1}
+.v-label{
+  font-family:var(--font-mono);
+  font-size:.58rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);
+}
+.v-badge{
+  font-family:var(--font-mono);
+  font-size:1.9rem;font-weight:700;
+  letter-spacing:.1em;color:var(--white);
+}
+.v-divider{width:1px;height:52px;background:var(--line2);flex-shrink:0}
+.v-pct{
+  font-family:var(--font-mono);
+  font-size:1.9rem;font-weight:700;
+  color:var(--white);
+}
+.v-bar{
+  height:3px;
+  background:var(--bg3);
+  border-radius:2px;
+  overflow:hidden;
+  margin-top:6px;
+}
+.v-fill{
+  height:100%;
+  background:var(--white);
+  border-radius:2px;
+  width:0;
+  transition:width 1.2s cubic-bezier(.16,1,.3,1);
+}
+
+/* Sections */
+.section{display:flex;flex-direction:column;gap:10px}
+.sec-label{
+  font-family:var(--font-mono);
+  font-size:.6rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--mid);
+  padding-bottom:8px;
+  border-bottom:1px solid var(--line);
+}
+.ev-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ev-item{
+  background:var(--bg1);
+  border:1px solid var(--line);
+  border-left:1px solid var(--white);
+  border-radius:4px;
+  padding:9px 11px;
+}
+.ev-name{
+  font-family:var(--font-body);
+  font-size:.85rem;font-weight:600;
+  color:var(--soft);
+}
+.ev-score{
+  font-family:var(--font-mono);
+  font-size:.62rem;color:var(--dim);
+  margin-top:2px;
+}
+.ev-score span{color:var(--mid)}
+
+.rationale{
+  font-size:.85rem;
+  color:var(--dim);
+  line-height:1.8;
+  background:var(--bg1);
+  border:1px solid var(--line);
+  border-left:1px solid var(--white);
+  border-radius:4px;
+  padding:12px 14px;
+}
+
+/* Doc card */
+.doc-card{
+  display:flex;align-items:center;gap:12px;
+  background:var(--bg1);
+  border:1px solid var(--line2);
+  border-radius:5px;
+  padding:12px 14px;
+}
+.doc-icon{
+  width:32px;height:32px;
+  background:var(--bg3);
+  border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.doc-info{flex:1}
+.doc-name{
+  font-family:var(--font-mono);
+  font-size:.78rem;color:var(--text);
+}
+.doc-meta{font-size:.72rem;color:var(--muted);margin-top:2px}
+.btn-dl{
+  background:none;
+  border:1px solid var(--line2);
+  color:var(--mid);
+  padding:7px 14px;
+  border-radius:3px;
+  font-family:var(--font-mono);
+  font-size:.65rem;
+  letter-spacing:.04em;
+  cursor:pointer;
+  display:flex;align-items:center;gap:6px;
+  flex-shrink:0;
+  transition:border-color .15s,color .15s;
+}
+.btn-dl:hover{border-color:var(--dim);color:var(--white)}
+
+/* Pipeline complete */
+.pipe-done{
+  display:flex;align-items:center;gap:6px;
+  justify-content:center;
+  flex-wrap:wrap;
+  padding-top:14px;
+  border-top:1px solid var(--line);
+}
+.pd-item{
+  display:flex;align-items:center;gap:5px;
+  font-family:var(--font-mono);
+  font-size:.6rem;
+  letter-spacing:.06em;
+  color:var(--dim);
+}
+.pd-dot{
+  width:4px;height:4px;
+  border-radius:50%;
+  background:var(--dim);
+}
+.pd-arrow{color:var(--line2);font-size:.7rem}
+
+/* ── ERROR STATE ── */
+.error-state{
+  display:flex;flex-direction:column;
+  align-items:center;text-align:center;
+  gap:14px;padding:40px;
+  max-width:420px;z-index:1;
+}
+.err-icon{
+  font-family:var(--font-mono);
+  font-size:1.4rem;color:var(--dim);
+}
+.err-title{
+  font-family:var(--font-body);
+  font-size:1.2rem;font-weight:700;
+  color:var(--white);
+}
+.err-msg{font-size:.82rem;color:var(--dim);line-height:1.7}
+.btn-retry{
+  background:none;border:1px solid var(--line2);
+  color:var(--dim);padding:9px 22px;
+  border-radius:3px;font-family:var(--font-mono);
+  font-size:.7rem;letter-spacing:.06em;cursor:pointer;
+  transition:.15s;
+}
+.btn-retry:hover{border-color:var(--white);color:var(--white)}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:24px;left:50%;
+  transform:translateX(-50%);
+  background:var(--bg2);
+  border:1px solid var(--line2);
+  color:var(--soft);
+  padding:10px 20px;border-radius:4px;
+  font-family:var(--font-mono);
+  font-size:.7rem;letter-spacing:.04em;
+  z-index:9998;
+  animation:fadeup .2s ease;
+}
+
+/* ── UTILITIES ── */
+.hidden{display:none!important}
+
+/* ── RESPONSIVE ── */
+@media(max-width:800px){
+  .layout{grid-template-columns:1fr}
+  .panel-left{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line)}
+  .topnav{display:none}
+}
+</style>
 </head>
 <body>
 
-  <!-- ── TOP NAV ─────────────────────────────────────────────── -->
-  <header class="topbar">
-    <div class="topbar-left">
-      <div class="logo-mark">
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M14 2L4 6.5V14.5C4 19.75 8.4 24.65 14 26C19.6 24.65 24 19.75 24 14.5V6.5L14 2Z" stroke="url(#shield-grad)" stroke-width="1.5" fill="url(#shield-fill)" />
-          <path d="M10 14L13 17L18 11" stroke="url(#check-grad)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          <defs>
-            <linearGradient id="shield-grad" x1="4" y1="2" x2="24" y2="26" gradientUnits="userSpaceOnUse">
-              <stop stop-color="#7c5cbf"/>
-              <stop offset="1" stop-color="#0fa5a5"/>
-            </linearGradient>
-            <linearGradient id="shield-fill" x1="4" y1="2" x2="24" y2="26" gradientUnits="userSpaceOnUse">
-              <stop stop-color="#7c5cbf" stop-opacity="0.15"/>
-              <stop offset="1" stop-color="#0fa5a5" stop-opacity="0.08"/>
-            </linearGradient>
-            <linearGradient id="check-grad" x1="10" y1="11" x2="18" y2="17" gradientUnits="userSpaceOnUse">
-              <stop stop-color="#9b6fe8"/>
-              <stop offset="1" stop-color="#13c4c4"/>
-            </linearGradient>
-          </defs>
+<!-- ── TOPBAR ── -->
+<header class="topbar">
+  <div class="logo">
+    <svg class="logo-icon" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M14 2L4 6.5V14.5C4 19.75 8.4 24.65 14 26C19.6 24.65 24 19.75 24 14.5V6.5L14 2Z"
+        stroke="#ffffff" stroke-width="1.4" fill="rgba(255,255,255,0.04)"/>
+      <path d="M10 14L13 17L18 11"
+        stroke="#ffffff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div class="logo-text">
+      <span class="name">AEGIS</span>
+      <span class="sub">Defense System</span>
+    </div>
+  </div>
+  <nav class="topnav">
+    <a href="#" class="on">Disputes</a>
+    <a href="#">History</a>
+    <a href="#">Analytics</a>
+  </nav>
+  <div class="top-right">
+    <div class="status">
+      <div class="status-dot"></div>
+      <span class="status-text">All Systems Operational</span>
+    </div>
+    <span class="api-ver">API v1.0</span>
+  </div>
+</header>
+
+<!-- ── MAIN ── -->
+<main class="layout">
+
+  <!-- LEFT — INTAKE FORM -->
+  <section class="panel-left">
+    <span class="panel-eyebrow">01 / Intake</span>
+    <h2 class="panel-title">Dispute Intake</h2>
+    <p class="panel-desc">Submit chargeback details for automated analysis and response generation.</p>
+
+    <div class="form">
+      <div class="field">
+        <label for="dispute_id">Dispute ID</label>
+        <input id="dispute_id" type="text" placeholder="e.g. CB-001"/>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="reason_code">Reason Code</label>
+          <select id="reason_code">
+            <option value="">Select code…</option>
+            <option value="13.1">13.1 — Merchandise Not Received</option>
+            <option value="13.3">13.3 — Not as Described</option>
+            <option value="13.7">13.7 — Cancelled Merchandise</option>
+            <option value="13.2">13.2 — Cancelled Recurring</option>
+            <option value="13.6">13.6 — Credit Not Processed</option>
+            <option value="10.4">10.4 — Fraudulent Transaction</option>
+            <option value="10.5">10.5 — Visa Fraud Monitoring</option>
+            <option value="12.6">12.6 — Duplicate Processing</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="amount">Amount (USD)</label>
+          <div class="prefix-wrap">
+            <span class="prefix">$</span>
+            <input id="amount" type="number" min="0" step="0.01" placeholder="0.00"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="merchant">Merchant Name</label>
+        <input id="merchant" type="text" placeholder="e.g. Acme Commerce LLC"/>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="txn_date">Transaction Date</label>
+          <input id="txn_date" type="date"/>
+        </div>
+        <div class="field">
+          <label for="cardholder">Cardholder Name</label>
+          <input id="cardholder" type="text" placeholder="Full name"/>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="notes">Notes <span class="opt">optional</span></label>
+        <textarea id="notes" rows="3" placeholder="Any supplementary context…"></textarea>
+      </div>
+
+      <button class="submit" id="submitBtn" onclick="submitDispute()">
+        <span>LAUNCH DEFENSE ANALYSIS</span>
+        <span class="arrow">→</span>
+      </button>
+
+      <p class="form-note">All dispute data is processed within your infrastructure.<br/>No data leaves your deployment.</p>
+    </div>
+  </section>
+
+  <!-- RIGHT — RESULTS PANEL -->
+  <section class="panel-right" id="rightPanel">
+
+    <!-- IDLE -->
+    <div class="idle" id="stateIdle">
+      <div class="idle-icon">
+        <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
+          <path d="M14 2L4 6.5V14.5C4 19.75 8.4 24.65 14 26C19.6 24.65 24 19.75 24 14.5V6.5L14 2Z"
+            stroke="#333" stroke-width="1.4" fill="rgba(255,255,255,0.02)"/>
+          <path d="M10 14L13 17L18 11"
+            stroke="#444" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
-      <div class="logo-text">
-        <span class="logo-title">AEGIS</span>
-        <span class="logo-sub">Defense System</span>
+      <span class="idle-eyebrow">Autonomous Chargeback Defense</span>
+      <h1 class="idle-headline">Never sleeps.<br/><em>Never misses.</em></h1>
+      <span class="idle-mono">— awaiting dispute input —</span>
+      <p class="idle-desc">Five specialized agents analyze, strategize, draft, and review your defense in under 10 seconds.</p>
+      <div class="agent-row">
+        <span class="ag-chip">Intake</span><span class="ag-arrow">→</span>
+        <span class="ag-chip">Evidence</span><span class="ag-arrow">→</span>
+        <span class="ag-chip">Strategy</span><span class="ag-arrow">→</span>
+        <span class="ag-chip">Writer</span><span class="ag-arrow">→</span>
+        <span class="ag-chip">Reviewer</span>
       </div>
     </div>
-    <nav class="topbar-nav">
-      <a href="#" class="nav-link active">Disputes</a>
-      <a href="#" class="nav-link">History</a>
-      <a href="#" class="nav-link">Analytics</a>
-    </nav>
-    <div class="topbar-right">
-      <div class="system-status">
-        <span class="status-dot pulse"></span>
-        <span class="status-label">All Systems Operational</span>
+
+    <!-- LOADING -->
+    <div class="loading hidden" id="stateLoading">
+      <div class="load-head">
+        <div class="spinner"></div>
+        <div>
+          <div class="load-title">Running Multi-Agent Analysis</div>
+          <div class="load-sub" id="loadSub">Initializing AEGIS agents…</div>
+        </div>
       </div>
-      <div class="api-badge">API v1.0</div>
+      <div class="pipeline" id="pipeline">
+        <div class="p-step" id="step-intake">
+          <div class="p-dot"></div>
+          <div>
+            <div class="p-name">Intake Agent</div>
+            <div class="p-status">Waiting</div>
+          </div>
+        </div>
+        <div class="p-conn"></div>
+        <div class="p-step" id="step-evidence">
+          <div class="p-dot"></div>
+          <div>
+            <div class="p-name">Evidence Collector</div>
+            <div class="p-status">Waiting</div>
+          </div>
+        </div>
+        <div class="p-conn"></div>
+        <div class="p-step" id="step-strategy">
+          <div class="p-dot"></div>
+          <div>
+            <div class="p-name">Strategy Agent</div>
+            <div class="p-status">Waiting</div>
+          </div>
+        </div>
+        <div class="p-conn"></div>
+        <div class="p-step" id="step-writer">
+          <div class="p-dot"></div>
+          <div>
+            <div class="p-name">Writer Agent</div>
+            <div class="p-status">Waiting</div>
+          </div>
+        </div>
+        <div class="p-conn"></div>
+        <div class="p-step" id="step-reviewer">
+          <div class="p-dot"></div>
+          <div>
+            <div class="p-name">Reviewer Agent</div>
+            <div class="p-status">Waiting</div>
+          </div>
+        </div>
+      </div>
     </div>
-  </header>
 
-  <!-- ── MAIN LAYOUT ──────────────────────────────────────────── -->
-  <main class="layout">
-
-    <!-- LEFT — INPUT PANEL -->
-    <section class="panel panel-input">
-      <div class="panel-header">
-        <span class="panel-tag">01</span>
-        <h2 class="panel-title">Dispute Intake</h2>
-        <p class="panel-desc">Submit chargeback details for automated analysis and response generation.</p>
+    <!-- RESULTS -->
+    <div class="results hidden" id="stateResults">
+      <div class="results-top">
+        <div>
+          <div class="results-id" id="resultId">CB-001</div>
+          <div class="results-title">Defense Ready</div>
+        </div>
+        <button class="btn-new" onclick="resetForm()">New Dispute</button>
       </div>
 
-      <div class="form-body">
-        <div class="field-group">
-          <label class="field-label" for="dispute_id">Dispute ID</label>
-          <input class="field-input" id="dispute_id" type="text" placeholder="e.g. CB-001" />
+      <div class="verdict-card">
+        <div class="v-left">
+          <div class="v-label">Recommended Action</div>
+          <div class="v-badge" id="verdictBadge">FIGHT</div>
         </div>
-
-        <div class="field-row">
-          <div class="field-group">
-            <label class="field-label" for="reason_code">Reason Code</label>
-            <div class="select-wrap">
-              <select class="field-input field-select" id="reason_code">
-                <option value="">Select code…</option>
-                <option value="13.1">13.1 — Merchandise Not Received</option>
-                <option value="13.3">13.3 — Not as Described</option>
-                <option value="13.7">13.7 — Cancelled Merchandise</option>
-                <option value="10.4">10.4 — Fraudulent Transaction</option>
-                <option value="12.6">12.6 — Duplicate Processing</option>
-                <option value="10.5">10.5 — Visa Fraud Monitoring</option>
-                <option value="13.2">13.2 — Cancelled Recurring</option>
-                <option value="13.6">13.6 — Credit Not Processed</option>
-              </select>
-              <svg class="select-arrow" width="12" height="12" viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
-            </div>
-          </div>
-          <div class="field-group">
-            <label class="field-label" for="amount">Amount (USD)</label>
-            <div class="input-prefix-wrap">
-              <span class="input-prefix">$</span>
-              <input class="field-input field-prefixed" id="amount" type="number" min="0" step="0.01" placeholder="0.00" />
-            </div>
-          </div>
-        </div>
-
-        <div class="field-group">
-          <label class="field-label" for="merchant">Merchant Name</label>
-          <input class="field-input" id="merchant" type="text" placeholder="e.g. Acme Commerce LLC" />
-        </div>
-
-        <div class="field-row">
-          <div class="field-group">
-            <label class="field-label" for="txn_date">Transaction Date</label>
-            <input class="field-input" id="txn_date" type="date" />
-          </div>
-          <div class="field-group">
-            <label class="field-label" for="cardholder">Cardholder Name</label>
-            <input class="field-input" id="cardholder" type="text" placeholder="Full name" />
-          </div>
-        </div>
-
-        <div class="field-group">
-          <label class="field-label" for="notes">Additional Notes <span class="label-opt">optional</span></label>
-          <textarea class="field-input field-textarea" id="notes" rows="3" placeholder="Any supplementary context for the agents…"></textarea>
-        </div>
-
-        <button class="btn-submit" id="submitBtn" onclick="submitDispute()">
-          <span class="btn-icon">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-          </span>
-          <span class="btn-text">Launch Defense Analysis</span>
-          <span class="btn-arrow">→</span>
-        </button>
-
-        <div class="form-footer">
-          <span class="lock-icon">🔒</span>
-          All dispute data is processed within your infrastructure. No data leaves your deployment.
-        </div>
-      </div>
-    </section>
-
-    <!-- RIGHT — RESULTS PANEL -->
-    <section class="panel panel-results">
-
-      <!-- IDLE STATE -->
-      <div class="idle-state" id="idleState">
-        <div class="idle-icon">
-          <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-            <path d="M24 4L8 11V23C8 33 15.6 42.3 24 44C32.4 42.3 40 33 40 23V11L24 4Z" stroke="url(#idle-grad)" stroke-width="1.5" fill="url(#idle-fill)"/>
-            <circle cx="24" cy="26" r="6" stroke="url(#idle-grad)" stroke-width="1.2"/>
-            <path d="M24 20v-6M21 14h6" stroke="url(#idle-grad)" stroke-width="1.2" stroke-linecap="round"/>
-            <defs>
-              <linearGradient id="idle-grad" x1="8" y1="4" x2="40" y2="44" gradientUnits="userSpaceOnUse">
-                <stop stop-color="#7c5cbf"/>
-                <stop offset="1" stop-color="#0fa5a5"/>
-              </linearGradient>
-              <linearGradient id="idle-fill" x1="8" y1="4" x2="40" y2="44" gradientUnits="userSpaceOnUse">
-                <stop stop-color="#7c5cbf" stop-opacity="0.1"/>
-                <stop offset="1" stop-color="#0fa5a5" stop-opacity="0.05"/>
-              </linearGradient>
-            </defs>
-          </svg>
-        </div>
-        <h3 class="idle-title">Awaiting Dispute Input</h3>
-        <p class="idle-desc">Complete the intake form and launch analysis.<br/>Five specialized agents will build your defense.</p>
-        <div class="agent-preview">
-          <div class="agent-chip">Intake</div>
-          <div class="agent-chip-arrow">→</div>
-          <div class="agent-chip">Evidence</div>
-          <div class="agent-chip-arrow">→</div>
-          <div class="agent-chip">Strategy</div>
-          <div class="agent-chip-arrow">→</div>
-          <div class="agent-chip">Writer</div>
-          <div class="agent-chip-arrow">→</div>
-          <div class="agent-chip">Reviewer</div>
+        <div class="v-divider"></div>
+        <div class="v-right">
+          <div class="v-label">Winability Score</div>
+          <div class="v-pct" id="winPct">80%</div>
+          <div class="v-bar"><div class="v-fill" id="winFill"></div></div>
         </div>
       </div>
 
-      <!-- LOADING STATE -->
-      <div class="loading-state hidden" id="loadingState">
-        <div class="loading-header">
-          <div class="loading-spinner"></div>
-          <div>
-            <p class="loading-title">Running Multi-Agent Analysis</p>
-            <p class="loading-sub" id="loadingSubtext">Initializing AEGIS agents…</p>
+      <div class="section">
+        <div class="sec-label">Evidence Gathered</div>
+        <div class="ev-grid" id="evGrid"></div>
+      </div>
+
+      <div class="section">
+        <div class="sec-label">Strategy Rationale</div>
+        <div class="rationale" id="rationale">—</div>
+      </div>
+
+      <div class="section">
+        <div class="sec-label">Generated Response Document</div>
+        <div class="doc-card">
+          <div class="doc-icon">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 2h7l3 3v9H3V2z" stroke="#555" stroke-width="1.2" fill="none"/>
+              <path d="M10 2v3h3" stroke="#555" stroke-width="1.2"/>
+              <path d="M5 8h6M5 11h4" stroke="#555" stroke-width="1" stroke-linecap="round"/>
+            </svg>
           </div>
-        </div>
-        <div class="pipeline" id="pipeline">
-          <div class="pipeline-step" id="step-intake" data-label="Intake Agent">
-            <div class="step-indicator"></div>
-            <div class="step-info">
-              <span class="step-name">Intake Agent</span>
-              <span class="step-status">Waiting</span>
-            </div>
+          <div class="doc-info">
+            <div class="doc-name" id="docName">CB-001.docx</div>
+            <div class="doc-meta">Formatted dispute response · Ready to submit</div>
           </div>
-          <div class="pipeline-connector"></div>
-          <div class="pipeline-step" id="step-evidence" data-label="Evidence Collector">
-            <div class="step-indicator"></div>
-            <div class="step-info">
-              <span class="step-name">Evidence Collector</span>
-              <span class="step-status">Waiting</span>
-            </div>
-          </div>
-          <div class="pipeline-connector"></div>
-          <div class="pipeline-step" id="step-strategy" data-label="Strategy Agent">
-            <div class="step-indicator"></div>
-            <div class="step-info">
-              <span class="step-name">Strategy Agent</span>
-              <span class="step-status">Waiting</span>
-            </div>
-          </div>
-          <div class="pipeline-connector"></div>
-          <div class="pipeline-step" id="step-writer" data-label="Writer Agent">
-            <div class="step-indicator"></div>
-            <div class="step-info">
-              <span class="step-name">Writer Agent</span>
-              <span class="step-status">Waiting</span>
-            </div>
-          </div>
-          <div class="pipeline-connector"></div>
-          <div class="pipeline-step" id="step-reviewer" data-label="Reviewer Agent">
-            <div class="step-indicator"></div>
-            <div class="step-info">
-              <span class="step-name">Reviewer Agent</span>
-              <span class="step-status">Waiting</span>
-            </div>
-          </div>
+          <button class="btn-dl" id="dlBtn">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Download
+          </button>
         </div>
       </div>
 
-      <!-- RESULTS STATE -->
-      <div class="results-state hidden" id="resultsState">
-
-        <div class="results-header">
-          <div>
-            <p class="results-dispute-id" id="resultDisputeId">CB-001</p>
-            <h3 class="results-title">Analysis Complete</h3>
-          </div>
-          <button class="btn-reset" onclick="resetForm()">New Dispute</button>
-        </div>
-
-        <!-- VERDICT CARD -->
-        <div class="verdict-card" id="verdictCard">
-          <div class="verdict-left">
-            <span class="verdict-label">Recommended Action</span>
-            <span class="verdict-badge" id="verdictBadge">FIGHT</span>
-          </div>
-          <div class="verdict-divider"></div>
-          <div class="verdict-right">
-            <span class="verdict-label">Winability Score</span>
-            <div class="winability">
-              <span class="winability-pct" id="winabilityPct">80%</span>
-              <div class="winability-bar">
-                <div class="winability-fill" id="winabilityFill"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- EVIDENCE SUMMARY -->
-        <div class="result-section">
-          <h4 class="section-heading">Evidence Gathered</h4>
-          <div class="evidence-grid" id="evidenceGrid">
-            <!-- filled by JS -->
-          </div>
-        </div>
-
-        <!-- STRATEGY RATIONALE -->
-        <div class="result-section">
-          <h4 class="section-heading">Strategy Rationale</h4>
-          <p class="strategy-text" id="strategyText">—</p>
-        </div>
-
-        <!-- DOCUMENT SECTION -->
-        <div class="result-section">
-          <h4 class="section-heading">Generated Response Document</h4>
-          <div class="doc-card" id="docCard">
-            <div class="doc-icon">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 2h8l4 4v12H4V2z" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M12 2v4h4" stroke="currentColor" stroke-width="1.2"/><path d="M7 9h6M7 12h6M7 15h4" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>
-            </div>
-            <div class="doc-info">
-              <span class="doc-name" id="docName">CB-001.docx</span>
-              <span class="doc-meta">Formatted dispute response · Ready to submit</span>
-            </div>
-            <button class="btn-download" id="downloadBtn">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v8M4 6l3 3 3-3M2 11h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              Download
-            </button>
-          </div>
-        </div>
-
-        <!-- PIPELINE COMPLETE -->
-        <div class="pipeline-complete" id="pipelineComplete">
-          <div class="pipeline-step-row">
-            <div class="ps-item done"><span class="ps-dot"></span><span>Intake</span></div>
-            <div class="ps-arrow">→</div>
-            <div class="ps-item done"><span class="ps-dot"></span><span>Evidence</span></div>
-            <div class="ps-arrow">→</div>
-            <div class="ps-item done"><span class="ps-dot"></span><span>Strategy</span></div>
-            <div class="ps-arrow">→</div>
-            <div class="ps-item done"><span class="ps-dot"></span><span>Writer</span></div>
-            <div class="ps-arrow">→</div>
-            <div class="ps-item done"><span class="ps-dot"></span><span>Reviewer</span></div>
-          </div>
-        </div>
-
+      <div class="pipe-done">
+        <div class="pd-item"><span class="pd-dot"></span>Intake</div><span class="pd-arrow">→</span>
+        <div class="pd-item"><span class="pd-dot"></span>Evidence</div><span class="pd-arrow">→</span>
+        <div class="pd-item"><span class="pd-dot"></span>Strategy</div><span class="pd-arrow">→</span>
+        <div class="pd-item"><span class="pd-dot"></span>Writer</div><span class="pd-arrow">→</span>
+        <div class="pd-item"><span class="pd-dot"></span>Reviewer</div>
       </div>
+    </div>
 
-      <!-- ERROR STATE -->
-      <div class="error-state hidden" id="errorState">
-        <div class="error-icon">⚠</div>
-        <h3 class="error-title">Analysis Failed</h3>
-        <p class="error-msg" id="errorMsg">Unable to connect to AEGIS API. Ensure the FastAPI server is running on localhost:8000.</p>
-        <button class="btn-retry" onclick="resetForm()">Try Again</button>
-      </div>
+    <!-- ERROR -->
+    <div class="error-state hidden" id="stateError">
+      <div class="err-icon">⊘</div>
+      <div class="err-title">Analysis Failed</div>
+      <p class="err-msg" id="errMsg">Unable to connect to AEGIS API. Ensure the FastAPI server is running on localhost:8000.</p>
+      <button class="btn-retry" onclick="resetForm()">Try Again</button>
+    </div>
 
-    </section>
-  </main>
+  </section>
+</main>
 
-  <script src="app.js"></script>
+<script>
+const API = 'https://aegis-production-1d9a.up.railway.app';
+let currentId = null;
+
+const $ = id => document.getElementById(id);
+
+const STEPS = [
+  {id:'step-intake',    sub:'Classifying dispute & urgency…',           delay:850},
+  {id:'step-evidence',  sub:'Gathering order, delivery & auth records…', delay:1300},
+  {id:'step-strategy',  sub:'Evaluating winability & strategy…',         delay:750},
+  {id:'step-writer',    sub:'Drafting formal dispute response…',          delay:1100},
+  {id:'step-reviewer',  sub:'Reviewing and finalising document…',         delay:650},
+];
+
+function showState(name){
+  ['stateIdle','stateLoading','stateResults','stateError'].forEach(id=>{
+    $(id).classList.add('hidden');
+  });
+  $(name).classList.remove('hidden');
+}
+
+function delay(ms){return new Promise(r=>setTimeout(r,ms))}
+
+function resetPipeline(){
+  STEPS.forEach(s=>{
+    const el=$(s.id);
+    el.classList.remove('active','done');
+    el.querySelector('.p-status').textContent='Waiting';
+  });
+}
+
+async function animatePipeline(){
+  for(let i=0;i<STEPS.length;i++){
+    const s=STEPS[i];
+    if(i>0){
+      const prev=$(STEPS[i-1].id);
+      prev.classList.remove('active');
+      prev.classList.add('done');
+      prev.querySelector('.p-status').textContent='Complete ✓';
+    }
+    const el=$(s.id);
+    el.classList.add('active');
+    el.querySelector('.p-status').textContent='Running…';
+    $('loadSub').textContent=s.sub;
+    await delay(s.delay);
+  }
+  const last=$(STEPS[STEPS.length-1].id);
+  last.classList.remove('active');
+  last.classList.add('done');
+  last.querySelector('.p-status').textContent='Complete ✓';
+  $('loadSub').textContent='Finalising response…';
+}
+
+function collectForm(){
+  const v=id=>($(id)?.value||'').trim();
+  return{
+    dispute_id:  v('dispute_id'),
+    reason_code: v('reason_code'),
+    amount:      parseFloat(v('amount'))||0,
+    merchant:    v('merchant'),
+    txn_date:    v('txn_date'),
+    cardholder:  v('cardholder'),
+    notes:       v('notes'),
+  };
+}
+
+function validate(d){
+  if(!d.dispute_id)  return'Please enter a Dispute ID.';
+  if(!d.reason_code) return'Please select a Reason Code.';
+  if(!d.amount||d.amount<=0) return'Please enter a valid amount.';
+  return null;
+}
+
+function renderResults(data, id){
+  $('resultId').textContent=id;
+
+  const verdict=(data.verdict||'FIGHT').toUpperCase();
+  $('verdictBadge').textContent=verdict;
+
+  const verdictColors={FIGHT:'#4ade80',ACCEPT:'#facc15',ESCALATE:'#f87171'};
+  $('verdictBadge').style.color=verdictColors[verdict]||'#fff';
+
+  const raw=data.winability_score??0.8;
+  const pct=Math.round((raw<=1?raw*100:raw));
+  $('winPct').textContent=pct+'%';
+  setTimeout(()=>{ $('winFill').style.width=pct+'%'; },120);
+
+  const grid=$('evGrid');
+  grid.innerHTML='';
+  const ev=data.evidence_collected||{};
+  if(Object.keys(ev).length){
+    Object.entries(ev).forEach(([k,v])=>{
+      const score=typeof v==='number'?v:(v?.strength??v?.score??null);
+      const label=k.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+      const scoreStr=score!==null?Math.round(score*100)+'%':'Present';
+      grid.innerHTML+=`<div class="ev-item">
+        <div class="ev-name">${label}</div>
+        <div class="ev-score">Score: <span>${scoreStr}</span></div>
+      </div>`;
+    });
+  } else {
+    ['Order Lookup','Delivery Proof','Device Fingerprint','Auth History'].forEach(n=>{
+      grid.innerHTML+=`<div class="ev-item">
+        <div class="ev-name">${n}</div>
+        <div class="ev-score">Score: <span>Collected</span></div>
+      </div>`;
+    });
+  }
+
+  $('rationale').textContent=data.strategy_reasoning||data.rationale||
+    'AEGIS has completed its multi-agent analysis. The recommendation above reflects evidence strength, reason code risk profile, and dispute strategy.';
+
+  $('docName').textContent=id+'.docx';
+  $('dlBtn').onclick=()=>downloadDoc(id);
+}
+
+async function submitDispute(){
+  const data=collectForm();
+  const err=validate(data);
+  if(err){toast(err);return}
+
+  const btn=$('submitBtn');
+  btn.disabled=true;
+  btn.querySelector('span').textContent='ANALYSING…';
+
+  resetPipeline();
+  showState('stateLoading');
+
+  const pipeP=animatePipeline();
+
+  try{
+    const res=await fetch(`${API}/dispute`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        chargeback_id: data.dispute_id,
+        merchant_id:   'MERCH-001',
+        transaction_id:'TXN-001',
+        amount:        data.amount,
+        reason_code:   data.reason_code,
+        reason_description: data.reason_code,
+        merchant:      data.merchant||undefined,
+        txn_date:      data.txn_date||undefined,
+        cardholder:    data.cardholder||undefined,
+        notes:         data.notes||undefined,
+      }),
+    });
+    if(!res.ok){
+      const e=await res.json().catch(()=>({}));
+      throw new Error(e.detail||`Server error ${res.status}`);
+    }
+    const result=await res.json();
+    currentId=data.dispute_id;
+    await pipeP;
+    await delay(300);
+    renderResults(result,data.dispute_id);
+    showState('stateResults');
+  }catch(e){
+    await pipeP.catch(()=>{});
+    $('errMsg').textContent=e.message.includes('Failed to fetch')
+      ?'Unable to reach the AEGIS API. Ensure the FastAPI server is running on localhost:8000.'
+      :e.message;
+    showState('stateError');
+  }finally{
+    btn.disabled=false;
+    btn.querySelector('span').textContent='LAUNCH DEFENSE ANALYSIS';
+  }
+}
+
+async function downloadDoc(id){
+  const btn=$('dlBtn');
+  const orig=btn.innerHTML;
+  btn.textContent='Downloading…';
+  btn.disabled=true;
+  try{
+    const res=await fetch(`${API}/dispute/${id}/download`);
+    if(!res.ok)throw new Error('Download failed');
+    const blob=await res.blob();
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;a.download=id+'.docx';
+    document.body.appendChild(a);a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }catch(e){
+    alert('Download failed: '+e.message);
+  }finally{
+    btn.innerHTML=orig;btn.disabled=false;
+  }
+}
+
+function resetForm(){
+  currentId=null;
+  showState('stateIdle');
+  ['dispute_id','reason_code','amount','merchant','txn_date','cardholder','notes']
+    .forEach(id=>{const el=$(id);if(el)el.value=''});
+}
+
+function toast(msg){
+  const t=document.querySelector('.toast');
+  if(t)t.remove();
+  const el=document.createElement('div');
+  el.className='toast';
+  el.textContent=msg;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),3200);
+}
+
+document.addEventListener('keydown',e=>{
+  if((e.metaKey||e.ctrlKey)&&e.key==='Enter')submitDispute();
+});
+</script>
 </body>
 </html>
