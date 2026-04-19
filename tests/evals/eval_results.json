@@ -1,0 +1,122 @@
+[
+  {
+    "id": "EVAL-001",
+    "status": "PASS",
+    "expected": "FIGHT",
+    "got": "FIGHT",
+    "winability": 0.85,
+    "review_passed": true
+  },
+  {
+    "id": "EVAL-002",
+    "status": "PASS",
+    "expected": "FIGHT",
+    "got": "FIGHT",
+    "winability": 0.85,
+    "review_passed": true
+  },
+  {
+    "id": "EVAL-003",
+    "status": "PASS",
+    "expected": "ANY",
+    "got": "FIGHT",
+    "winability": 0.75,
+    "review_passed": true
+  },
+  {
+    "id": "EVAL-004",
+    "status": "PASS",
+    "expected": "FIGHT",
+    "got": "FIGHT",
+    "winability": 0.8,
+    "review_passed": true
+  },
+  {
+    "id": "EVAL-005",
+    "status": "PASS",
+    "expected": "FIGHT",
+    "got": "FIGHT",
+    "winability": 0.85,
+    "review_passed": true
+  },
+  {
+    "id": "EVAL-006",
+    "status": "PASS",
+    "expected": "FIGHT",
+    "got": "FIGHT",
+    "winability": 0.8,
+    "review_passed": true
+  },
+  {
+    "id": "EVAL-007",
+    "status": "PASS",
+    "expected": "FIGHT",
+    "got": "FIGHT",
+    "winability": 0.75,
+    "review_passed": true
+  },
+  {
+    "id": "EVAL-008",
+    "status": "PASS",
+    "expected": "ANY",
+    "got": "FIGHT",
+    "winability": 0.7,
+    "review_passed": true
+  },
+  {
+    "id": "EVAL-009",
+    "status": "PASS",
+    "expected": "ANY",
+    "got": "FIGHT",
+    "winability": 0.7,
+    "review_passed": true
+  },
+  {
+    "id": "EVAL-010",
+    "status": "PASS",
+    "expected": "ANY",
+    "got": "FIGHT",
+    "winability": 0.0,
+    "review_passed": true
+  },
+  {
+    "id": "EVAL-011",
+    "status": "PASS",
+    "expected": "ESCALATE",
+    "got": "ESCALATE",
+    "winability": 0.0,
+    "review_passed": null
+  },
+  {
+    "id": "EVAL-012",
+    "status": "PASS",
+    "expected": "ANY",
+    "got": "FIGHT",
+    "winability": 0.8,
+    "review_passed": true
+  },
+  {
+    "id": "EVAL-013",
+    "status": "PASS",
+    "expected": "ANY",
+    "got": "FIGHT",
+    "winability": 0.75,
+    "review_passed": true
+  },
+  {
+    "id": "EVAL-014",
+    "status": "PASS",
+    "expected": "FIGHT",
+    "got": "FIGHT",
+    "winability": 0.85,
+    "review_passed": true
+  },
+  {
+    "id": "EVAL-015",
+    "status": "PASS",
+    "expected": "FIGHT",
+    "got": "FIGHT",
+    "winability": 0.8,
+    "review_passed": true
+  }
+]
