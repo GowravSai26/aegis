@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -8,35 +8,155 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{font-size:14px;-webkit-font-smoothing:antialiased}
+
+/* ── THEME TOKENS ── */
 :root{
-  --black:#0a0a0a;
-  --black2:#111;
-  --black3:#1a1a1a;
-  --white:#ffffff;
+  --font:'Inter',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --bar:52px;
+  --transition: background .2s, color .2s, border-color .2s;
+}
+
+/* DARK MODE (default) */
+[data-theme="dark"]{
+  --bg:#0a0a0a;
+  --bg2:#111;
+  --bg3:#1a1a1a;
+  --fg:#ffffff;
   --off:#f2f2f2;
   --gray:#888;
   --gray2:#555;
   --gray3:#333;
   --border:#2a2a2a;
   --border2:#ddd;
-  --font:'Inter',sans-serif;
-  --mono:'JetBrains Mono',monospace;
-  --bar:52px;
+  --hero-geo-bg:#111;
+  --hero-geo-p1:#0a0a0a;
+  --hero-geo-p2:#1a1a1a;
+  --idle-mark-bg:#fff;
+  --idle-mark-stroke:#0a0a0a;
+  --res-header-bg:#fff;
+  --res-header-fg:#0a0a0a;
+  --res-header-btn-bg:transparent;
+  --res-header-btn-fg:#0a0a0a;
+  --res-header-btn-border:#555;
+  --res-header-btn-hover-bg:#0a0a0a;
+  --res-header-btn-hover-fg:#fff;
+  --load-top-bg:#111;
+  --rp-bg:#0a0a0a;
+  --err-head-bg:#111;
+  --toggle-bg:#1a1a1a;
+  --toggle-border:#2a2a2a;
+  --toggle-fg:#888;
+  --toggle-dot:#ffffff;
+  --cta-bg:#ffffff;
+  --cta-fg:#0a0a0a;
+  --cta-hover:#f2f2f2;
+  --hero-cta-bg:#ffffff;
+  --hero-cta-fg:#0a0a0a;
+  --hero-cta-hover:#f2f2f2;
+  --stat-bg:#0a0a0a;
+  --form-bg:#0a0a0a;
+  --input-border:#2a2a2a;
+  --input-focus:#ffffff;
+  --input-placeholder:#555;
+  --sec-lbl-bg:#111;
+  --doc-ico-bg:#111;
+  --dl-bg:#ffffff;
+  --dl-fg:#0a0a0a;
+  --dl-hover:#f2f2f2;
+  --retry-bg:#ffffff;
+  --retry-fg:#0a0a0a;
+  --retry-hover:#f2f2f2;
+  --ring-border:#2a2a2a;
+  --ring-top:#fff;
+  --ps-active-bg:#111;
+  --pd-active:#fff;
+  --vfill:#fff;
+  --toast-bg:#ffffff;
+  --toast-fg:#0a0a0a;
+  --brand-geo-stroke:#fff;
+  --agents-border:#2a2a2a;
+  --geo-accent:#1a1a1a;
+  --geo-outline:#2a2a2a;
+  --geo-line:#1e1e1e;
 }
-body{background:var(--black);color:var(--white);font-family:var(--font);line-height:1.5;min-height:100vh;overflow-x:hidden}
+
+/* LIGHT MODE */
+[data-theme="light"]{
+  --bg:#f5f4f0;
+  --bg2:#ebebeb;
+  --bg3:#e0e0e0;
+  --fg:#0a0a0a;
+  --off:#111;
+  --gray:#555;
+  --gray2:#888;
+  --gray3:#bbb;
+  --border:#d0d0d0;
+  --border2:#333;
+  --hero-geo-bg:#e8e8e4;
+  --hero-geo-p1:#f0efe9;
+  --hero-geo-p2:#ddddd8;
+  --idle-mark-bg:#0a0a0a;
+  --idle-mark-stroke:#fff;
+  --res-header-bg:#0a0a0a;
+  --res-header-fg:#fff;
+  --res-header-btn-bg:transparent;
+  --res-header-btn-fg:#fff;
+  --res-header-btn-border:#888;
+  --res-header-btn-hover-bg:#fff;
+  --res-header-btn-hover-fg:#0a0a0a;
+  --load-top-bg:#ebebeb;
+  --rp-bg:#f5f4f0;
+  --err-head-bg:#ebebeb;
+  --toggle-bg:#e8e8e4;
+  --toggle-border:#c8c8c8;
+  --toggle-fg:#555;
+  --toggle-dot:#0a0a0a;
+  --cta-bg:#0a0a0a;
+  --cta-fg:#ffffff;
+  --cta-hover:#222;
+  --hero-cta-bg:#0a0a0a;
+  --hero-cta-fg:#ffffff;
+  --hero-cta-hover:#222;
+  --stat-bg:#f5f4f0;
+  --form-bg:#f5f4f0;
+  --input-border:#c8c8c8;
+  --input-focus:#0a0a0a;
+  --input-placeholder:#aaa;
+  --sec-lbl-bg:#ebebeb;
+  --doc-ico-bg:#ebebeb;
+  --dl-bg:#0a0a0a;
+  --dl-fg:#ffffff;
+  --dl-hover:#222;
+  --retry-bg:#0a0a0a;
+  --retry-fg:#ffffff;
+  --retry-hover:#222;
+  --ring-border:#c8c8c8;
+  --ring-top:#0a0a0a;
+  --ps-active-bg:#ebebeb;
+  --pd-active:#0a0a0a;
+  --vfill:#0a0a0a;
+  --toast-bg:#0a0a0a;
+  --toast-fg:#ffffff;
+  --brand-geo-stroke:#0a0a0a;
+  --agents-border:#d0d0d0;
+  --geo-accent:#e0dfdb;
+  --geo-outline:#c8c8c8;
+  --geo-line:#dadada;
+}
+
+body{background:var(--bg);color:var(--fg);font-family:var(--font);line-height:1.5;min-height:100vh;overflow-x:hidden;transition:var(--transition)}
 
 /* ── TOPBAR ── */
 .bar{
   position:fixed;top:0;left:0;right:0;height:var(--bar);
-  background:var(--black);border-bottom:1px solid var(--border);
+  background:var(--bg);border-bottom:1px solid var(--border);
   display:flex;align-items:center;padding:0 32px;gap:24px;z-index:200;
+  transition:var(--transition);
 }
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0}
-.brand-icon{
-  width:28px;height:28px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-}
-.brand-name{font-size:.82rem;font-weight:900;letter-spacing:.18em;color:var(--white)}
+.brand-icon{width:28px;height:28px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.brand-name{font-size:.82rem;font-weight:900;letter-spacing:.18em;color:var(--fg)}
 .bar-nav{display:flex;gap:0;flex:1}
 .bar-nav a{
   font-size:.72rem;font-weight:500;color:var(--gray);
@@ -44,15 +164,38 @@ body{background:var(--black);color:var(--white);font-family:var(--font);line-hei
   border-right:1px solid var(--border);
 }
 .bar-nav a:first-child{border-left:1px solid var(--border)}
-.bar-nav a:hover{color:var(--white);background:var(--black3)}
-.bar-nav a.on{color:var(--white);background:var(--black3)}
+.bar-nav a:hover{color:var(--fg);background:var(--bg3)}
+.bar-nav a.on{color:var(--fg);background:var(--bg3)}
 .bar-right{display:flex;align-items:center;gap:0;flex-shrink:0;margin-left:auto}
 .bar-right span{
   font-family:var(--mono);font-size:.6rem;letter-spacing:.08em;
   color:var(--gray);border-left:1px solid var(--border);padding:0 16px;
 }
-.dot-live{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--white);margin-right:6px;animation:pls 2.5s infinite}
+.dot-live{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--fg);margin-right:6px;animation:pls 2.5s infinite}
 @keyframes pls{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ── THEME TOGGLE ── */
+.theme-toggle{
+  display:flex;align-items:center;gap:8px;
+  border-left:1px solid var(--border);padding:0 16px;cursor:pointer;
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.08em;color:var(--gray);
+  background:none;border-top:none;border-right:none;border-bottom:none;
+  transition:var(--transition);white-space:nowrap;
+  height:var(--bar);
+}
+.theme-toggle:hover{color:var(--fg)}
+.toggle-track{
+  width:32px;height:16px;border-radius:8px;
+  background:var(--toggle-bg);border:1px solid var(--toggle-border);
+  position:relative;transition:var(--transition);flex-shrink:0;
+}
+.toggle-knob{
+  position:absolute;top:2px;left:2px;
+  width:10px;height:10px;border-radius:50%;
+  background:var(--toggle-dot);
+  transition:transform .2s cubic-bezier(.4,0,.2,1), background .2s;
+}
+[data-theme="light"] .toggle-knob{transform:translateX(16px)}
 
 /* ── HERO ── */
 .hero{
@@ -62,6 +205,7 @@ body{background:var(--black);color:var(--white);font-family:var(--font);line-hei
   grid-template-columns:1fr 1fr;
   border-bottom:1px solid var(--border);
   position:relative;overflow:hidden;
+  transition:var(--transition);
 }
 .hero-left{
   padding:64px 56px;
@@ -70,25 +214,24 @@ body{background:var(--black);color:var(--white);font-family:var(--font);line-hei
   position:relative;z-index:2;
 }
 .hero-kicker{font-family:var(--mono);font-size:.6rem;letter-spacing:.22em;color:var(--gray);text-transform:uppercase;margin-bottom:20px}
-.hero-h{font-size:3.2rem;font-weight:900;letter-spacing:-.04em;line-height:1.05;color:var(--white);margin-bottom:20px}
+.hero-h{font-size:3.2rem;font-weight:900;letter-spacing:-.04em;line-height:1.05;color:var(--fg);margin-bottom:20px}
 .hero-h em{font-style:normal;display:block;color:var(--gray)}
 .hero-sub{font-size:.88rem;color:var(--gray);line-height:1.75;max-width:380px;margin-bottom:32px}
 .hero-cta{
   display:inline-flex;align-items:center;gap:10px;
-  background:var(--white);color:var(--black);
+  background:var(--hero-cta-bg);color:var(--hero-cta-fg);
   padding:12px 28px;font-size:.78rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
   border:none;cursor:pointer;transition:.15s;
   width:fit-content;
 }
-.hero-cta:hover{background:var(--off)}
+.hero-cta:hover{background:var(--hero-cta-hover)}
 .hero-cta .arr{transition:transform .15s}
 .hero-cta:hover .arr{transform:translateX(4px)}
 
-/* Geometric right panel */
 .hero-geo{
-  position:relative;background:var(--black2);
+  position:relative;background:var(--hero-geo-bg);
   display:flex;align-items:center;justify-content:center;
-  overflow:hidden;
+  overflow:hidden;transition:var(--transition);
 }
 .geo-svg{position:absolute;inset:0;width:100%;height:100%}
 
@@ -96,12 +239,11 @@ body{background:var(--black);color:var(--white);font-family:var(--font);line-hei
 .stats{
   display:grid;grid-template-columns:repeat(4,1fr);
   border-bottom:1px solid var(--border);
+  background:var(--bg);transition:var(--transition);
 }
-.stat{
-  padding:28px 32px;border-right:1px solid var(--border);
-}
+.stat{padding:28px 32px;border-right:1px solid var(--border)}
 .stat:last-child{border-right:none}
-.stat-n{font-size:2rem;font-weight:900;letter-spacing:-.03em;color:var(--white);margin-bottom:4px}
+.stat-n{font-size:2rem;font-weight:900;letter-spacing:-.03em;color:var(--fg);margin-bottom:4px}
 .stat-l{font-family:var(--mono);font-size:.6rem;letter-spacing:.14em;color:var(--gray);text-transform:uppercase}
 
 /* ── MAIN CONTENT ── */
@@ -111,35 +253,33 @@ body{background:var(--black);color:var(--white);font-family:var(--font);line-hei
 .form-panel{
   padding:48px 56px;
   border-right:1px solid var(--border);
+  background:var(--bg);transition:var(--transition);
 }
 .fp-kicker{font-family:var(--mono);font-size:.58rem;letter-spacing:.2em;color:var(--gray);text-transform:uppercase;margin-bottom:12px}
-.fp-h{font-size:1.6rem;font-weight:900;letter-spacing:-.025em;color:var(--white);margin-bottom:6px}
+.fp-h{font-size:1.6rem;font-weight:900;letter-spacing:-.025em;color:var(--fg);margin-bottom:6px}
 .fp-sub{font-size:.8rem;color:var(--gray);line-height:1.65;margin-bottom:32px}
-
 .fields{display:flex;flex-direction:column;gap:18px}
 .f{display:flex;flex-direction:column;gap:7px}
 .frow{display:flex;gap:16px}
 .frow .f{flex:1}
-
 .lbl{font-family:var(--mono);font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gray)}
-.lbl .opt{color:var(--border);text-transform:none;font-size:.56rem;letter-spacing:.04em;margin-left:4px}
+.lbl .opt{color:var(--gray3);text-transform:none;font-size:.56rem;letter-spacing:.04em;margin-left:4px}
 
 input,select,textarea{
   width:100%;background:transparent;
-  border:none;border-bottom:1px solid var(--border);
+  border:none;border-bottom:1px solid var(--input-border);
   padding:10px 0;font-family:var(--font);font-size:.85rem;
-  color:var(--white);outline:none;
-  transition:border-color .15s;appearance:none;
-  border-radius:0;
+  color:var(--fg);outline:none;
+  transition:border-color .15s, color .2s;appearance:none;border-radius:0;
 }
-input::placeholder,textarea::placeholder{color:var(--gray2)}
-input:focus,select:focus,textarea:focus{border-bottom-color:var(--white)}
+input::placeholder,textarea::placeholder{color:var(--input-placeholder)}
+input:focus,select:focus,textarea:focus{border-bottom-color:var(--input-focus)}
 select{
   cursor:pointer;padding-right:24px;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-position:right 4px center;
 }
-select option{background:var(--black3);color:var(--white)}
+select option{background:var(--bg3);color:var(--fg)}
 textarea{resize:vertical;min-height:70px;line-height:1.55;padding-top:10px}
 .pre{position:relative}
 .pre-sym{position:absolute;left:0;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:.8rem;color:var(--gray);pointer-events:none}
@@ -147,82 +287,75 @@ textarea{resize:vertical;min-height:70px;line-height:1.55;padding-top:10px}
 
 .cta{
   width:100%;padding:14px 20px;margin-top:8px;
-  background:var(--white);border:none;
-  color:var(--black);font-family:var(--font);font-size:.78rem;font-weight:800;
+  background:var(--cta-bg);border:none;
+  color:var(--cta-fg);font-family:var(--font);font-size:.78rem;font-weight:800;
   letter-spacing:.1em;text-transform:uppercase;
   display:flex;align-items:center;justify-content:center;gap:10px;
-  cursor:pointer;transition:background .15s;
+  cursor:pointer;transition:.15s;
 }
-.cta:hover{background:var(--off)}
+.cta:hover{background:var(--cta-hover)}
 .cta:disabled{opacity:.3;cursor:not-allowed}
 .cta .carr{margin-left:auto;transition:transform .15s}
 .cta:hover .carr{transform:translateX(4px)}
-
 .form-note{font-family:var(--mono);font-size:.56rem;color:var(--gray2);text-align:center;line-height:1.7;letter-spacing:.03em;margin-top:4px}
 
 /* ── RESULT PANEL ── */
 .result-panel{
   display:flex;align-items:center;justify-content:center;
   position:relative;overflow:hidden;
-  background:var(--black);
+  background:var(--rp-bg);transition:var(--transition);
 }
-
-/* geo bg for result panel */
 .rp-geo{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 
 /* ── IDLE ── */
-.idle{
-  display:flex;flex-direction:column;gap:20px;
-  z-index:2;padding:56px;max-width:460px;
-}
+.idle{display:flex;flex-direction:column;gap:20px;z-index:2;padding:56px;max-width:460px}
 .idle-mark{
-  width:64px;height:64px;background:var(--white);
-  display:flex;align-items:center;justify-content:center;
-  margin-bottom:8px;
+  width:64px;height:64px;background:var(--idle-mark-bg);
+  display:flex;align-items:center;justify-content:center;margin-bottom:8px;
+  transition:var(--transition);
 }
 .idle-kicker{font-family:var(--mono);font-size:.58rem;letter-spacing:.2em;color:var(--gray);text-transform:uppercase}
-.idle-h{font-size:2rem;font-weight:900;letter-spacing:-.03em;line-height:1.1;color:var(--white)}
+.idle-h{font-size:2rem;font-weight:900;letter-spacing:-.03em;line-height:1.1;color:var(--fg)}
 .idle-h em{font-style:normal;color:var(--gray)}
 .idle-body{font-size:.82rem;color:var(--gray);line-height:1.8}
-.agents{display:flex;flex-direction:column;gap:0;border:1px solid var(--border);margin-top:4px}
+.agents{display:flex;flex-direction:column;gap:0;border:1px solid var(--agents-border);margin-top:4px}
 .ag-row{
   display:flex;align-items:center;justify-content:space-between;
-  padding:9px 14px;border-bottom:1px solid var(--border);
+  padding:9px 14px;border-bottom:1px solid var(--agents-border);
   font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;color:var(--gray2);
 }
 .ag-row:last-child{border-bottom:none}
-.ag-num{color:var(--border);font-size:.56rem}
+.ag-num{color:var(--gray3);font-size:.56rem}
 
 /* ── LOADING ── */
 .loading{display:flex;flex-direction:column;gap:0;z-index:2;width:100%;max-width:460px;margin:56px}
 .load-top{
-  padding:20px 24px;background:var(--black2);border:1px solid var(--border);
-  display:flex;align-items:center;gap:16px;margin-bottom:0;
-  border-bottom:none;
+  padding:20px 24px;background:var(--load-top-bg);border:1px solid var(--border);
+  display:flex;align-items:center;gap:16px;margin-bottom:0;border-bottom:none;
+  transition:var(--transition);
 }
 .ring{
   width:20px;height:20px;flex-shrink:0;
-  border:1.5px solid var(--border);border-top-color:var(--white);
+  border:1.5px solid var(--ring-border);border-top-color:var(--ring-top);
   border-radius:50%;animation:spin .65s linear infinite;
 }
 @keyframes spin{to{transform:rotate(360deg)}}
-.load-h{font-size:.88rem;font-weight:700;color:var(--white)}
+.load-h{font-size:.88rem;font-weight:700;color:var(--fg)}
 .load-s{font-family:var(--mono);font-size:.58rem;color:var(--gray);margin-top:2px;letter-spacing:.04em}
-
 .pipe{display:flex;flex-direction:column}
 .ps{
   display:flex;align-items:center;gap:14px;
   padding:12px 24px;border:1px solid var(--border);border-top:none;
-  background:var(--black);transition:.2s;
+  background:var(--bg);transition:.2s;
 }
-.ps.active{background:var(--black2)}
-.ps.done{background:var(--black)}
+.ps.active{background:var(--ps-active-bg)}
+.ps.done{background:var(--bg)}
 .pd{width:6px;height:6px;border-radius:50%;background:var(--border);flex-shrink:0;transition:.2s}
-.ps.active .pd{background:var(--white);animation:bk 1s ease-in-out infinite}
+.ps.active .pd{background:var(--pd-active);animation:bk 1s ease-in-out infinite}
 .ps.done .pd{background:var(--gray)}
 @keyframes bk{0%,100%{opacity:1}50%{opacity:.15}}
 .pn{font-size:.84rem;font-weight:600;color:var(--gray2)}
-.ps.active .pn{color:var(--white)}
+.ps.active .pn{color:var(--fg)}
 .ps.done .pn{color:var(--gray)}
 .pst{font-family:var(--mono);font-size:.56rem;color:var(--gray2);letter-spacing:.06em;margin-top:1px}
 .ps.active .pst{color:var(--gray)}
@@ -233,103 +366,79 @@ textarea{resize:vertical;min-height:70px;line-height:1.55;padding-top:10px}
 /* ── RESULTS ── */
 .results{width:100%;max-width:460px;z-index:2;display:flex;flex-direction:column;gap:0;animation:up .3s ease;margin:56px}
 @keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-
 .res-header{
   padding:20px 24px;border:1px solid var(--border);border-bottom:none;
-  background:var(--white);display:flex;align-items:center;justify-content:space-between;
+  background:var(--res-header-bg);display:flex;align-items:center;justify-content:space-between;
+  transition:var(--transition);
 }
-.res-id{font-family:var(--mono);font-size:.58rem;letter-spacing:.16em;color:var(--gray2)}
-.res-h{font-size:1rem;font-weight:900;letter-spacing:-.01em;color:var(--black);margin-top:2px}
+.res-id{font-family:var(--mono);font-size:.58rem;letter-spacing:.16em;color:var(--res-header-fg);opacity:.6}
+.res-h{font-size:1rem;font-weight:900;letter-spacing:-.01em;color:var(--res-header-fg)}
 .btn-new{
-  background:transparent;border:1px solid var(--gray2);color:var(--black);
+  background:var(--res-header-btn-bg);border:1px solid var(--res-header-btn-border);color:var(--res-header-btn-fg);
   padding:6px 14px;font-size:.68rem;font-weight:600;letter-spacing:.06em;cursor:pointer;transition:.15s;
 }
-.btn-new:hover{background:var(--black);color:var(--white);border-color:var(--black)}
-
-.verdict{
-  border:1px solid var(--border);border-top:none;
-  display:grid;grid-template-columns:1fr 1fr;
-}
+.btn-new:hover{background:var(--res-header-btn-hover-bg);color:var(--res-header-btn-hover-fg);border-color:var(--res-header-btn-hover-bg)}
+.verdict{border:1px solid var(--border);border-top:none;display:grid;grid-template-columns:1fr 1fr}
 .vblock{padding:20px 24px;display:flex;flex-direction:column;gap:4px}
 .vblock:first-child{border-right:1px solid var(--border)}
 .vlbl{font-family:var(--mono);font-size:.56rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gray)}
-.vbig{font-size:1.6rem;font-weight:900;letter-spacing:.04em;color:var(--white)}
-.vpct{font-size:1.6rem;font-weight:900;letter-spacing:-.01em;color:var(--white)}
+.vbig{font-size:1.6rem;font-weight:900;letter-spacing:.04em;color:var(--fg)}
+.vpct{font-size:1.6rem;font-weight:900;letter-spacing:-.01em;color:var(--fg)}
 .vbar{height:2px;background:var(--border);margin-top:10px}
-.vfill{height:100%;width:0;background:var(--white);transition:width 1.3s cubic-bezier(.16,1,.3,1)}
-
+.vfill{height:100%;width:0;background:var(--vfill);transition:width 1.3s cubic-bezier(.16,1,.3,1)}
 .sec{display:flex;flex-direction:column}
 .sec-lbl{
   font-family:var(--mono);font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;
   color:var(--gray);padding:10px 24px;border:1px solid var(--border);border-top:none;
-  background:var(--black2);
+  background:var(--sec-lbl-bg);transition:var(--transition);
 }
 .evg{display:grid;grid-template-columns:1fr 1fr}
 .evc{padding:14px 24px;border:1px solid var(--border);border-top:none}
 .evc:nth-child(odd){border-right:none}
 .evc:nth-child(even){border-left:1px solid var(--border)}
-.evc-name{font-size:.82rem;font-weight:600;color:var(--white)}
+.evc-name{font-size:.82rem;font-weight:600;color:var(--fg)}
 .evc-score{font-family:var(--mono);font-size:.58rem;color:var(--gray);margin-top:3px}
-.evc-score b{color:var(--white);font-weight:500}
-
-.rat{
-  font-size:.8rem;color:var(--gray);line-height:1.8;
-  padding:16px 24px;border:1px solid var(--border);border-top:none;
-}
-
-.doc{
-  display:flex;align-items:center;gap:14px;
-  padding:14px 24px;border:1px solid var(--border);border-top:none;
-}
+.evc-score b{color:var(--fg);font-weight:500}
+.rat{font-size:.8rem;color:var(--gray);line-height:1.8;padding:16px 24px;border:1px solid var(--border);border-top:none}
+.doc{display:flex;align-items:center;gap:14px;padding:14px 24px;border:1px solid var(--border);border-top:none}
 .doc-ico{
-  width:32px;height:32px;background:var(--black2);border:1px solid var(--border);
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  width:32px;height:32px;background:var(--doc-ico-bg);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:var(--transition);
 }
 .doc-info{flex:1}
-.doc-name{font-family:var(--mono);font-size:.72rem;color:var(--white)}
+.doc-name{font-family:var(--mono);font-size:.72rem;color:var(--fg)}
 .doc-meta{font-size:.7rem;color:var(--gray);margin-top:2px}
 .btn-dl{
-  background:var(--white);color:var(--black);border:none;
+  background:var(--dl-bg);color:var(--dl-fg);border:none;
   padding:8px 16px;font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;
-  font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.15s;
-  flex-shrink:0;
+  font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.15s;flex-shrink:0;
 }
-.btn-dl:hover{background:var(--off)}
-
-.trail{
-  display:flex;align-items:center;gap:0;
-  border:1px solid var(--border);border-top:none;
-}
+.btn-dl:hover{background:var(--dl-hover)}
+.trail{display:flex;align-items:center;gap:0;border:1px solid var(--border);border-top:none}
 .titem{
   display:flex;align-items:center;gap:6px;flex:1;
   padding:9px 14px;border-right:1px solid var(--border);
   font-family:var(--mono);font-size:.56rem;letter-spacing:.08em;color:var(--gray2);
 }
 .titem:last-child{border-right:none}
-.tdot{width:4px;height:4px;background:var(--white);flex-shrink:0}
+.tdot{width:4px;height:4px;background:var(--fg);flex-shrink:0}
 
 /* ── ERROR ── */
-.err{
-  display:flex;flex-direction:column;gap:0;z-index:2;
-  width:100%;max-width:400px;margin:56px;
-}
-.err-head{
-  padding:20px 24px;background:var(--black2);border:1px solid var(--border);
-  border-bottom:none;
-}
-.err-h{font-size:.9rem;font-weight:700;color:var(--white)}
+.err{display:flex;flex-direction:column;gap:0;z-index:2;width:100%;max-width:400px;margin:56px}
+.err-head{padding:20px 24px;background:var(--err-head-bg);border:1px solid var(--border);border-bottom:none;transition:var(--transition)}
+.err-h{font-size:.9rem;font-weight:700;color:var(--fg)}
 .err-b{font-size:.8rem;color:var(--gray);line-height:1.7;padding:16px 24px;border:1px solid var(--border);border-top:none}
 .btn-retry{
-  background:var(--white);color:var(--black);border:none;
+  background:var(--retry-bg);color:var(--retry-fg);border:none;
   padding:12px 24px;font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;
   font-weight:700;cursor:pointer;transition:.15s;width:100%;text-transform:uppercase;
 }
-.btn-retry:hover{background:var(--off)}
+.btn-retry:hover{background:var(--retry-hover)}
 
 /* ── TOAST ── */
 .toast{
   position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
-  background:var(--white);color:var(--black);
+  background:var(--toast-bg);color:var(--toast-fg);
   padding:10px 22px;font-family:var(--mono);font-size:.66rem;letter-spacing:.06em;
   z-index:9999;animation:up .2s ease;white-space:nowrap;
 }
@@ -353,8 +462,8 @@ textarea{resize:vertical;min-height:70px;line-height:1.55;padding-top:10px}
   <a class="brand" href="#">
     <div class="brand-icon">
       <svg width="18" height="22" viewBox="0 0 18 22" fill="none">
-        <polygon points="9,1 17,6 17,16 9,21 1,16 1,6" stroke="white" stroke-width="1.4" fill="none"/>
-        <path d="M9 7l-3 4h3l-1 4 4-5h-3z" fill="white"/>
+        <polygon points="9,1 17,6 17,16 9,21 1,16 1,6" stroke="var(--fg)" stroke-width="1.4" fill="none"/>
+        <path d="M9 7l-3 4h3l-1 4 4-5h-3z" fill="var(--fg)"/>
       </svg>
     </div>
     <span class="brand-name">AEGIS</span>
@@ -368,6 +477,11 @@ textarea{resize:vertical;min-height:70px;line-height:1.55;padding-top:10px}
   <div class="bar-right">
     <span><span class="dot-live"></span>All systems live</span>
     <span>API v1.0</span>
+    <!-- THEME TOGGLE -->
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode">
+      <div class="toggle-track"><div class="toggle-knob"></div></div>
+      <span id="themeLabel">LIGHT</span>
+    </button>
   </div>
 </header>
 
@@ -383,49 +497,33 @@ textarea{resize:vertical;min-height:70px;line-height:1.55;padding-top:10px}
   </div>
   <div class="hero-geo">
     <svg class="geo-svg" viewBox="0 0 600 460" fill="none" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-      <!-- Dark polygon shapes like the reference -->
-      <polygon points="0,0 600,0 600,460 0,460" fill="#111"/>
-      <polygon points="180,0 600,0 600,320 380,460 80,460" fill="#0a0a0a"/>
-      <polygon points="600,0 600,200 420,0" fill="#1a1a1a"/>
-      <polygon points="0,180 280,0 340,100 160,300" fill="#161616"/>
-      <polygon points="200,460 480,460 600,300 600,460" fill="#151515"/>
-      <polygon points="350,80 520,0 600,80 520,180" fill="#222"/>
-      <polygon points="60,240 200,180 240,300 100,360" fill="#141414"/>
-      <polygon points="400,200 560,160 600,260 480,320" fill="#181818"/>
-      <polygon points="260,360 420,300 460,420 300,460" fill="#1c1c1c"/>
-      <!-- Outlines -->
-      <polygon points="180,0 600,0 600,320 380,460 80,460" fill="none" stroke="#2a2a2a" stroke-width=".7"/>
-      <polygon points="350,80 520,0 600,80 520,180" fill="none" stroke="#333" stroke-width=".5"/>
-      <polygon points="60,240 200,180 240,300 100,360" fill="none" stroke="#252525" stroke-width=".5"/>
-      <!-- White accent triangle -->
-      <polygon points="500,20 580,20 580,90" fill="none" stroke="white" stroke-width="1"/>
-      <polygon points="40,380 100,380 70,440" fill="none" stroke="#333" stroke-width=".8"/>
-      <!-- Small detail shapes -->
-      <rect x="420" y="160" width="12" height="12" fill="none" stroke="#333" stroke-width=".8" transform="rotate(15,426,166)"/>
-      <line x1="300" y1="0" x2="420" y2="460" stroke="#1e1e1e" stroke-width=".5"/>
-      <line x1="500" y1="0" x2="200" y2="460" stroke="#1e1e1e" stroke-width=".5"/>
+      <polygon points="0,0 600,0 600,460 0,460" fill="var(--hero-geo-bg)"/>
+      <polygon points="180,0 600,0 600,320 380,460 80,460" fill="var(--hero-geo-p1)"/>
+      <polygon points="600,0 600,200 420,0" fill="var(--geo-accent)"/>
+      <polygon points="0,180 280,0 340,100 160,300" fill="var(--geo-accent)"/>
+      <polygon points="200,460 480,460 600,300 600,460" fill="var(--hero-geo-bg)"/>
+      <polygon points="350,80 520,0 600,80 520,180" fill="var(--hero-geo-p2)"/>
+      <polygon points="60,240 200,180 240,300 100,360" fill="var(--hero-geo-p1)"/>
+      <polygon points="400,200 560,160 600,260 480,320" fill="var(--geo-accent)"/>
+      <polygon points="260,360 420,300 460,420 300,460" fill="var(--hero-geo-p2)"/>
+      <polygon points="180,0 600,0 600,320 380,460 80,460" fill="none" stroke="var(--geo-outline)" stroke-width=".7"/>
+      <polygon points="350,80 520,0 600,80 520,180" fill="none" stroke="var(--geo-outline)" stroke-width=".5"/>
+      <polygon points="60,240 200,180 240,300 100,360" fill="none" stroke="var(--geo-outline)" stroke-width=".5"/>
+      <polygon points="500,20 580,20 580,90" fill="none" stroke="var(--brand-geo-stroke)" stroke-width="1"/>
+      <polygon points="40,380 100,380 70,440" fill="none" stroke="var(--geo-outline)" stroke-width=".8"/>
+      <rect x="420" y="160" width="12" height="12" fill="none" stroke="var(--geo-outline)" stroke-width=".8" transform="rotate(15,426,166)"/>
+      <line x1="300" y1="0" x2="420" y2="460" stroke="var(--geo-line)" stroke-width=".5"/>
+      <line x1="500" y1="0" x2="200" y2="460" stroke="var(--geo-line)" stroke-width=".5"/>
     </svg>
   </div>
 </section>
 
 <!-- STATS -->
 <div class="stats">
-  <div class="stat">
-    <div class="stat-n">94%</div>
-    <div class="stat-l">Win Rate</div>
-  </div>
-  <div class="stat">
-    <div class="stat-n">&lt;10s</div>
-    <div class="stat-l">Analysis Time</div>
-  </div>
-  <div class="stat">
-    <div class="stat-n">5</div>
-    <div class="stat-l">Specialized Agents</div>
-  </div>
-  <div class="stat">
-    <div class="stat-n">8</div>
-    <div class="stat-l">Reason Codes</div>
-  </div>
+  <div class="stat"><div class="stat-n">94%</div><div class="stat-l">Win Rate</div></div>
+  <div class="stat"><div class="stat-n">&lt;10s</div><div class="stat-l">Analysis Time</div></div>
+  <div class="stat"><div class="stat-n">5</div><div class="stat-l">Specialized Agents</div></div>
+  <div class="stat"><div class="stat-n">8</div><div class="stat-l">Reason Codes</div></div>
 </div>
 
 <!-- MAIN CONTENT -->
@@ -436,7 +534,6 @@ textarea{resize:vertical;min-height:70px;line-height:1.55;padding-top:10px}
     <div class="fp-kicker">01 — Intake</div>
     <h2 class="fp-h">Submit Dispute</h2>
     <p class="fp-sub">Enter chargeback details below. AEGIS runs five agents in sequence — intake, evidence, strategy, writing, and review.</p>
-
     <div class="fields">
       <div class="f">
         <label class="lbl" for="dispute_id">Dispute ID</label>
@@ -493,27 +590,25 @@ textarea{resize:vertical;min-height:70px;line-height:1.55;padding-top:10px}
 
   <!-- RESULT PANEL -->
   <div class="result-panel" id="rightPanel">
-
-    <!-- BG geo -->
     <svg class="rp-geo" viewBox="0 0 560 600" fill="none" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-      <polygon points="0,0 560,0 560,600 0,600" fill="#0a0a0a"/>
-      <polygon points="400,0 560,0 560,200 280,300" fill="#111" stroke="#1e1e1e" stroke-width=".6"/>
-      <polygon points="0,400 200,300 280,500 100,600 0,600" fill="#0d0d0d" stroke="#1e1e1e" stroke-width=".6"/>
-      <polygon points="200,0 400,100 300,250 100,200" fill="#0f0f0f" stroke="#252525" stroke-width=".5"/>
-      <polygon points="350,350 500,280 560,420 480,520 340,480" fill="#111" stroke="#1e1e1e" stroke-width=".5"/>
-      <polygon points="480,40 540,20 560,80 520,100" fill="none" stroke="#2a2a2a" stroke-width=".8"/>
-      <polygon points="20,520 80,500 60,560" fill="none" stroke="#222" stroke-width=".6"/>
-      <line x1="0" y1="300" x2="560" y2="200" stroke="#181818" stroke-width=".5"/>
-      <line x1="280" y1="0" x2="160" y2="600" stroke="#181818" stroke-width=".5"/>
-      <polygon points="500,50 540,50 540,90 500,90" fill="none" stroke="white" stroke-width=".8" transform="rotate(10,520,70)"/>
+      <polygon points="0,0 560,0 560,600 0,600" fill="var(--rp-bg)"/>
+      <polygon points="400,0 560,0 560,200 280,300" fill="var(--hero-geo-bg)" stroke="var(--geo-line)" stroke-width=".6"/>
+      <polygon points="0,400 200,300 280,500 100,600 0,600" fill="var(--hero-geo-p1)" stroke="var(--geo-line)" stroke-width=".6"/>
+      <polygon points="200,0 400,100 300,250 100,200" fill="var(--hero-geo-p1)" stroke="var(--geo-outline)" stroke-width=".5"/>
+      <polygon points="350,350 500,280 560,420 480,520 340,480" fill="var(--hero-geo-bg)" stroke="var(--geo-line)" stroke-width=".5"/>
+      <polygon points="480,40 540,20 560,80 520,100" fill="none" stroke="var(--geo-outline)" stroke-width=".8"/>
+      <polygon points="20,520 80,500 60,560" fill="none" stroke="var(--geo-outline)" stroke-width=".6"/>
+      <line x1="0" y1="300" x2="560" y2="200" stroke="var(--geo-line)" stroke-width=".5"/>
+      <line x1="280" y1="0" x2="160" y2="600" stroke="var(--geo-line)" stroke-width=".5"/>
+      <polygon points="500,50 540,50 540,90 500,90" fill="none" stroke="var(--brand-geo-stroke)" stroke-width=".8" transform="rotate(10,520,70)"/>
     </svg>
 
     <!-- IDLE -->
     <div class="idle" id="stateIdle">
       <div class="idle-mark">
         <svg width="28" height="32" viewBox="0 0 18 22" fill="none">
-          <polygon points="9,1 17,6 17,16 9,21 1,16 1,6" stroke="#0a0a0a" stroke-width="1.2" fill="none"/>
-          <path d="M9 7l-3 4h3l-1 4 4-5h-3z" fill="#0a0a0a"/>
+          <polygon points="9,1 17,6 17,16 9,21 1,16 1,6" stroke="var(--idle-mark-stroke)" stroke-width="1.2" fill="none"/>
+          <path d="M9 7l-3 4h3l-1 4 4-5h-3z" fill="var(--idle-mark-stroke)"/>
         </svg>
       </div>
       <span class="idle-kicker">Awaiting Dispute Input</span>
@@ -538,80 +633,39 @@ textarea{resize:vertical;min-height:70px;line-height:1.55;padding-top:10px}
         </div>
       </div>
       <div class="pipe">
-        <div class="ps" id="step-intake">
-          <div class="pd"></div>
-          <div style="flex:1"><div class="pn">Intake Agent</div><div class="pst">Waiting</div></div>
-          <span class="pnum">01</span>
-        </div>
-        <div class="ps" id="step-evidence">
-          <div class="pd"></div>
-          <div style="flex:1"><div class="pn">Evidence Collector</div><div class="pst">Waiting</div></div>
-          <span class="pnum">02</span>
-        </div>
-        <div class="ps" id="step-strategy">
-          <div class="pd"></div>
-          <div style="flex:1"><div class="pn">Strategy Agent</div><div class="pst">Waiting</div></div>
-          <span class="pnum">03</span>
-        </div>
-        <div class="ps" id="step-writer">
-          <div class="pd"></div>
-          <div style="flex:1"><div class="pn">Writer Agent</div><div class="pst">Waiting</div></div>
-          <span class="pnum">04</span>
-        </div>
-        <div class="ps" id="step-reviewer">
-          <div class="pd"></div>
-          <div style="flex:1"><div class="pn">Reviewer Agent</div><div class="pst">Waiting</div></div>
-          <span class="pnum">05</span>
-        </div>
+        <div class="ps" id="step-intake"><div class="pd"></div><div style="flex:1"><div class="pn">Intake Agent</div><div class="pst">Waiting</div></div><span class="pnum">01</span></div>
+        <div class="ps" id="step-evidence"><div class="pd"></div><div style="flex:1"><div class="pn">Evidence Collector</div><div class="pst">Waiting</div></div><span class="pnum">02</span></div>
+        <div class="ps" id="step-strategy"><div class="pd"></div><div style="flex:1"><div class="pn">Strategy Agent</div><div class="pst">Waiting</div></div><span class="pnum">03</span></div>
+        <div class="ps" id="step-writer"><div class="pd"></div><div style="flex:1"><div class="pn">Writer Agent</div><div class="pst">Waiting</div></div><span class="pnum">04</span></div>
+        <div class="ps" id="step-reviewer"><div class="pd"></div><div style="flex:1"><div class="pn">Reviewer Agent</div><div class="pst">Waiting</div></div><span class="pnum">05</span></div>
       </div>
     </div>
 
     <!-- RESULTS -->
     <div class="results hidden" id="stateResults">
       <div class="res-header">
-        <div>
-          <div class="res-id" id="resultId">CB-001</div>
-          <div class="res-h">Defense Ready</div>
-        </div>
+        <div><div class="res-id" id="resultId">CB-001</div><div class="res-h">Defense Ready</div></div>
         <button class="btn-new" onclick="resetForm()">+ New</button>
       </div>
       <div class="verdict">
-        <div class="vblock">
-          <div class="vlbl">Recommendation</div>
-          <div class="vbig" id="verdictBadge">FIGHT</div>
-        </div>
-        <div class="vblock">
-          <div class="vlbl">Winability Score</div>
-          <div class="vpct" id="winPct">80%</div>
-          <div class="vbar"><div class="vfill" id="winFill"></div></div>
-        </div>
+        <div class="vblock"><div class="vlbl">Recommendation</div><div class="vbig" id="verdictBadge">FIGHT</div></div>
+        <div class="vblock"><div class="vlbl">Winability Score</div><div class="vpct" id="winPct">80%</div><div class="vbar"><div class="vfill" id="winFill"></div></div></div>
       </div>
-      <div class="sec">
-        <div class="sec-lbl">Evidence Gathered</div>
-        <div class="evg" id="evGrid"></div>
-      </div>
-      <div class="sec">
-        <div class="sec-lbl">Strategy Rationale</div>
-        <div class="rat" id="rationale">—</div>
-      </div>
+      <div class="sec"><div class="sec-lbl">Evidence Gathered</div><div class="evg" id="evGrid"></div></div>
+      <div class="sec"><div class="sec-lbl">Strategy Rationale</div><div class="rat" id="rationale">—</div></div>
       <div class="sec">
         <div class="sec-lbl">Response Document</div>
         <div class="doc">
           <div class="doc-ico">
             <svg width="14" height="16" viewBox="0 0 14 16" fill="none">
-              <path d="M2 1h8l3 3v11H2V1z" stroke="white" stroke-width="1" fill="none"/>
-              <path d="M10 1v3h3" stroke="white" stroke-width="1"/>
-              <path d="M4 7h6M4 10h5M4 13h3" stroke="white" stroke-width=".8" stroke-linecap="round"/>
+              <path d="M2 1h8l3 3v11H2V1z" stroke="var(--fg)" stroke-width="1" fill="none"/>
+              <path d="M10 1v3h3" stroke="var(--fg)" stroke-width="1"/>
+              <path d="M4 7h6M4 10h5M4 13h3" stroke="var(--fg)" stroke-width=".8" stroke-linecap="round"/>
             </svg>
           </div>
-          <div class="doc-info">
-            <div class="doc-name" id="docName">CB-001.docx</div>
-            <div class="doc-meta">Formatted · Ready to submit</div>
-          </div>
+          <div class="doc-info"><div class="doc-name" id="docName">CB-001.docx</div><div class="doc-meta">Formatted · Ready to submit</div></div>
           <button class="btn-dl" id="dlBtn">
-            <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
-              <path d="M5.5 1v6M3 5l2.5 2.5L8 5M1 9.5h9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M5.5 1v6M3 5l2.5 2.5L8 5M1 9.5h9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
             Download
           </button>
         </div>
@@ -627,13 +681,10 @@ textarea{resize:vertical;min-height:70px;line-height:1.55;padding-top:10px}
 
     <!-- ERROR -->
     <div class="err hidden" id="stateError">
-      <div class="err-head">
-        <div class="err-h">Analysis Failed</div>
-      </div>
+      <div class="err-head"><div class="err-h">Analysis Failed</div></div>
       <div class="err-b" id="errMsg">Unable to connect to the AEGIS API. Please check the server and try again.</div>
       <button class="btn-retry" onclick="resetForm()">Try Again →</button>
     </div>
-
   </div>
 </div>
 
@@ -641,6 +692,22 @@ textarea{resize:vertical;min-height:70px;line-height:1.55;padding-top:10px}
 const API='https://aegis-production-1d9a.up.railway.app';
 let currentId=null;
 const $=id=>document.getElementById(id);
+
+/* ── THEME ── */
+function toggleTheme(){
+  const html=document.documentElement;
+  const isDark=html.getAttribute('data-theme')==='dark';
+  html.setAttribute('data-theme',isDark?'light':'dark');
+  $('themeLabel').textContent=isDark?'DARK':'LIGHT';
+  localStorage.setItem('aegis-theme',isDark?'light':'dark');
+}
+(function initTheme(){
+  const saved=localStorage.getItem('aegis-theme');
+  if(saved){
+    document.documentElement.setAttribute('data-theme',saved);
+    $('themeLabel').textContent=saved==='light'?'DARK':'LIGHT';
+  }
+})();
 
 const STEPS=[
   {id:'step-intake',  sub:'Classifying dispute & urgency…',            delay:850},
