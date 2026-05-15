@@ -13,8 +13,7 @@
 
 ## 🔴 Live API
 
-**`https://aegis-production-1d9a.up.railway.app`** — Live on Railway.  
-Full Swagger docs at [`/docs`](https://aegis-production-1d9a.up.railway.app/docs)
+**[argus.vercel.app](https://aegis-zeta-ten.vercel.app//)**
 
 ---
 
