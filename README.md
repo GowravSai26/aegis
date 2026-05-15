@@ -13,7 +13,7 @@
 
 ## 🔴 Live API
 
-**[argus.vercel.app](https://aegis-zeta-ten.vercel.app//)**
+**[aegis.vercel.app](https://aegis-zeta-ten.vercel.app//)**
 
 ---
 
